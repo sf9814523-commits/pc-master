@@ -1,0 +1,1435 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1412">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Мастерская ПК</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Unbounded:wght@500;600&display=swap">
+<style>
+/* Layout: sticky 3D stage beside a lesson panel; wide views (quiz, wiki, progress) drop the stage. Palette: graphite-green neutrals, PCB copper accent, probe-cyan for hints. */
+:root{
+  --bg:#edf0ee;--surface:#f8faf8;--surface2:#e3e8e5;--line:#ccd5d0;--fg:#14201c;--muted:#566860;
+  --accent:#b8520a;--accent-fg:#ffffff;--accent-soft:#f6e3d3;
+  --ok:#0f7d58;--ok-soft:#d7eee5;--warn:#8f6209;--warn-soft:#f6ebcf;--bad:#bb3326;--bad-soft:#f6dcd8;--cool:#0c7480;--cool-soft:#d3ebee;
+  --font-d:'Unbounded','Exo 2',system-ui,sans-serif;
+  --font-b:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-m:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  --hh:96px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1412;--surface:#141e1b;--surface2:#1b2724;--line:#293935;--fg:#e4ece8;--muted:#8fa49a;
+  --accent:#f0893a;--accent-fg:#1c0f04;--accent-soft:#3a2314;
+  --ok:#3ecf92;--ok-soft:#12362a;--warn:#e6b04c;--warn-soft:#3a2f12;--bad:#f2695a;--bad-soft:#3d1a16;--cool:#4fcfdc;--cool-soft:#10353a;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1412;--surface:#141e1b;--surface2:#1b2724;--line:#293935;--fg:#e4ece8;--muted:#8fa49a;
+  --accent:#f0893a;--accent-fg:#1c0f04;--accent-soft:#3a2314;
+  --ok:#3ecf92;--ok-soft:#12362a;--warn:#e6b04c;--warn-soft:#3a2f12;--bad:#f2695a;--bad-soft:#3d1a16;--cool:#4fcfdc;--cool-soft:#10353a;color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--font-b);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--surface)}
+h1,h2,h3,h4,p{margin:0}
+h1,h2,h3{font-family:var(--font-d);font-weight:600;letter-spacing:-.01em;text-wrap:balance;line-height:1.2}
+h1{font-size:clamp(18px,2.6vw,22px)}h2{font-size:16px}h3{font-size:15px}
+button{font:inherit;color:inherit;cursor:pointer}
+input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
+.mono{font-family:var(--font-m)}
+.muted{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-block:7px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1500px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand .mark{width:30px;height:30px;flex:none;color:var(--fg)}
+.brand b{display:block;font:600 15px/1.1 var(--font-d)}
+.brand span{display:block;font-size:11px;color:var(--muted);white-space:nowrap}.brand span b{display:inline;font:500 11px var(--font-m);color:var(--accent);letter-spacing:.02em}
+.tabs{display:flex;gap:3px;padding:3px;background:var(--surface2);border-radius:12px;overflow-x:auto;scrollbar-width:none;order:3;flex:1 1 100%;max-width:100%}
+.tabs::-webkit-scrollbar{display:none}
+.tab{display:flex;align-items:center;gap:6px;padding:6px 10px;font-size:14px;border:0;border-radius:9px;background:transparent;color:var(--muted);font-weight:500;white-space:nowrap;transition:background .2s,color .2s}
+.tab svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.tab:hover{color:var(--fg)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--fg);box-shadow:0 0 0 1px var(--line)}
+.tab[aria-selected="true"] svg{stroke:var(--accent)}
+#themeBtn{margin-left:auto}
+@media (min-width:900px){.tabs{order:0;flex:0 1 auto;margin-left:auto}#themeBtn{margin-left:0}}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;border-radius:9px;border:1px solid var(--line);background:var(--surface);font-weight:500;transition:transform .15s,background .2s,border-color .2s}
+.btn:hover{border-color:var(--accent)}
+.btn:active{transform:translateY(1px)}
+.btn.pri{background:var(--accent);border-color:transparent;color:var(--accent-fg)}
+.btn.pri:hover{filter:brightness(1.06)}
+.btn.sm{padding:6px 10px;font-size:13px}
+.btn.icon{padding:8px;width:38px;height:38px}
+.btn.icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* layout */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,400px);gap:14px;max-width:1500px;margin:0 auto;padding-block:12px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body[data-wide] .layout{grid-template-columns:minmax(0,1fr);max-width:980px}
+body[data-wide] .stage{display:none}
+.panel{min-width:0}
+.view{display:none}
+.view.on{display:block;animation:rise .35s ease}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* 3D stage */
+.stage{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--hh) + 12px);height:calc(100vh - var(--hh) - 28px);min-height:380px;display:grid;grid-template-rows:minmax(0,1fr) auto;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:radial-gradient(120% 90% at 50% 25%,var(--surface),var(--surface2))}
+.stage::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:32px 32px;opacity:.3;pointer-events:none}
+.gl{position:relative;min-height:0;touch-action:none;cursor:grab;outline:none}
+.gl:active{cursor:grabbing}
+.gl canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
+.hint{position:absolute;left:10px;top:8px;right:10px;font:400 11px/1.4 var(--font-m);color:var(--muted);pointer-events:none;letter-spacing:.02em}
+.tip{position:absolute;z-index:3;transform:translate(-50%,-130%);padding:5px 10px;border-radius:8px;background:var(--fg);color:var(--bg);font:500 12px/1.3 var(--font-b);white-space:nowrap;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.stageMsg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--muted)}
+.tools{position:relative;display:flex;gap:6px;align-items:center;padding:6px 8px;border-top:1px solid var(--line);background:var(--surface);overflow-x:auto;scrollbar-width:none}
+.tools::-webkit-scrollbar{display:none}
+.tg{flex:none;padding:5px 10px;border-radius:99px;border:1px solid var(--line);background:var(--surface);font-size:12px;font-weight:500;white-space:nowrap;transition:background .2s,border-color .2s}
+.tg:hover{border-color:var(--accent)}
+.tg[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.slider{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;flex:1 0 130px;min-width:130px;max-width:220px}
+.slider input{flex:1;min-width:0;accent-color:var(--accent)}
+body[data-big] .layout{grid-template-columns:minmax(0,1fr) minmax(0,360px)}
+@media (max-width:899px){
+  .layout{grid-template-columns:minmax(0,1fr)!important;gap:10px}
+  .stage{height:min(34vh,300px);min-height:220px;top:calc(env(safe-area-inset-top,0px) + var(--hh) + 6px);z-index:20}
+  body[data-big] .stage{height:62vh;max-height:560px}
+  .hint{display:none}
+}
+
+/* content */
+.head{display:grid;gap:6px;margin-bottom:10px}
+.eyebrow{font:500 11px/1 var(--font-m);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.lead{color:var(--muted);max-width:62ch;font-size:14px}@media (max-width:899px){.lead{font-size:13px}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px;min-width:0}
+.stack{display:grid;gap:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row.sp{justify-content:space-between}
+.kv{display:grid;gap:12px;margin-top:12px}
+.kv h4{font:500 11px/1 var(--font-m);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:500;background:var(--surface2);color:var(--muted)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.cool{background:var(--cool-soft);color:var(--cool)}
+.pill.acc{background:var(--accent-soft);color:var(--accent)}
+.grp{font:500 11px/1 var(--font-m);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:12px 0 6px}
+.partgrid{display:flex;flex-wrap:wrap;gap:6px}
+.pc{padding:6px 11px;border-radius:99px;border:1px solid var(--line);background:var(--surface);font-size:13px;display:inline-flex;gap:6px;align-items:center;transition:border-color .2s,background .2s}
+.pc:hover{border-color:var(--accent)}
+.pc.on{background:var(--accent-soft);border-color:var(--accent)}
+.pc i{width:6px;height:6px;border-radius:50%;background:var(--line)}
+.pc.seen i{background:var(--ok)}
+.gaming .partgrid,.gaming .grp,.gaming #partCard{display:none}
+.note{padding:10px 12px;border-radius:10px;font-size:14px;background:var(--cool-soft);border:1px solid color-mix(in srgb,var(--cool) 35%,transparent)}
+.note.warn{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 40%,transparent)}
+.note b{font-weight:600}
+.bar{height:8px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .5s ease}
+
+/* steps & options */
+.steps{display:grid;gap:4px;margin-top:12px;max-height:210px;overflow:auto}
+.st{display:flex;gap:10px;align-items:center;text-align:left;padding:8px 10px;border-radius:9px;border:1px solid transparent;background:transparent;color:var(--muted);transition:background .2s}
+.st:hover{background:var(--surface2)}
+.st b{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:500 12px var(--font-m);background:var(--surface2)}
+.st.done{color:var(--fg)}.st.done b{background:var(--ok);color:var(--bg)}
+.st.cur{color:var(--fg);border-color:var(--accent);background:var(--accent-soft)}.st.cur b{background:var(--accent);color:var(--accent-fg)}
+.opt{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);transition:transform .15s,border-color .2s,background .2s}
+.opt:hover:not([disabled]){border-color:var(--accent);transform:translateX(2px)}
+.opt[disabled]{cursor:default}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt.dim{opacity:.55}
+.scen{display:grid;gap:6px;text-align:left;width:100%;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--surface);transition:transform .2s,border-color .2s}
+.scen:hover{border-color:var(--accent);transform:translateY(-2px)}
+.lvl{display:inline-flex;gap:3px;vertical-align:middle}
+.lvl i{width:14px;height:5px;border-radius:3px;background:var(--line)}
+.lvl i.f{background:var(--accent)}
+.stars{color:var(--accent);letter-spacing:2px}
+.ticket{padding:14px;border-radius:12px;border:1px dashed var(--muted);background:var(--surface2);display:grid;gap:6px}
+.ticket .mono{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.log{display:grid;gap:6px;max-height:260px;overflow:auto}
+.log div{font:13px/1.5 var(--font-m);padding:6px 10px;border-left:3px solid var(--line);background:var(--surface2);border-radius:0 8px 8px 0}
+.log .g{border-color:var(--ok)}.log .b{border-color:var(--bad)}
+.score{font:600 13px var(--font-m)}
+
+/* wiki, progress */
+.search{width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+.wiki{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-top:12px}
+.wiki .card{display:grid;gap:6px;align-content:start}
+.ach{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.ach .a{padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);opacity:.5}
+.ach .a.got{opacity:1;border-color:var(--ok)}
+.ring{width:120px;height:120px;flex:none}
+.ring text{font:600 22px var(--font-d);fill:var(--fg)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stats .card b{display:block;font:600 22px var(--font-d)}
+.toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom,0px));transform:translate(-50%,24px);opacity:0;z-index:80;padding:10px 16px;border-radius:12px;background:var(--fg);color:var(--bg);font-weight:500;pointer-events:none;transition:opacity .3s,transform .3s;max-width:calc(100vw - 32px);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.foot{padding:14px max(16px,env(safe-area-inset-left,0px)) calc(18px + env(safe-area-inset-bottom,0px));text-align:center;color:var(--muted);font:400 12px var(--font-m);letter-spacing:.04em}
+.foot b{color:var(--accent);font-weight:500}
+
+/* account, avatars, leaderboard */
+.av{display:inline-grid;place-items:center;flex:none;border-radius:50%;background:color-mix(in srgb,var(--c,var(--accent)) 20%,var(--surface));color:var(--c,var(--accent));border:1.5px solid var(--c,var(--accent))}
+.av svg{width:58%;height:58%;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#accBtn{display:inline-flex;align-items:center;gap:8px;padding:3px 10px 3px 4px;border-radius:99px;max-width:170px}
+#accBtn.new{padding:6px 12px;background:var(--accent);color:var(--accent-fg);border-color:transparent}
+#accBtn .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+@media (max-width:520px){#accBtn .nm{display:none}#accBtn{padding:3px}#accBtn.new{padding:6px 10px}}
+.modal{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:16px;background:rgba(8,14,12,.55);backdrop-filter:blur(3px);overflow:auto}
+.modal[hidden]{display:none}
+.sheet{width:min(460px,100%);max-height:100%;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:12px;animation:rise .25s ease}
+.fld{display:grid;gap:5px}
+.fld label,.fld .lab{font:500 11px/1 var(--font-m);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.fld input[type=text]{padding:10px 12px;border-radius:9px;border:1px solid var(--line);background:var(--bg);width:100%}
+.avgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.avgrid button{aspect-ratio:1;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);display:grid;place-items:center;padding:0;transition:border-color .2s,transform .15s}
+.avgrid button:hover{transform:translateY(-1px)}
+.avgrid button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.avgrid svg{width:55%;height:55%;fill:none;stroke:var(--fg);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.cols{display:flex;gap:8px;flex-wrap:wrap}
+.cols button{width:28px;height:28px;border-radius:50%;border:2px solid transparent;padding:0;background:var(--c);box-shadow:0 0 0 1px var(--line)}
+.cols button[aria-pressed="true"]{border-color:var(--fg)}
+.err{color:var(--bad);font-size:13px;min-height:1.2em}
+.seg{display:inline-flex;padding:3px;border-radius:10px;background:var(--surface2);gap:3px}
+.seg button{border:0;background:transparent;padding:6px 12px;border-radius:8px;font-weight:500;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 0 0 1px var(--line)}
+.sel{padding:7px 10px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+.lb{display:grid;gap:6px;margin-top:12px}
+.lr{display:grid;grid-template-columns:34px 38px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+.lr.me{border-color:var(--accent);background:var(--accent-soft)}
+.lr .rk{font:600 14px var(--font-d);text-align:center;color:var(--muted)}
+.lr.r1 .rk,.lr.r2 .rk,.lr.r3 .rk{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:13px}
+.lr.r1 .rk{background:#c9961a}.lr.r2 .rk{background:#7f8c93}.lr.r3 .rk{background:#a0623a}
+.lr .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lr .sub{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lr .pts{font:600 16px var(--font-d);text-align:right}
+.lr .pts small{display:block;font:400 11px var(--font-m);color:var(--muted)}
+.lr .x{grid-column:1/-1;display:flex;justify-content:flex-end;margin-top:-2px}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <div class="brand">
+    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="3" width="26" height="26" rx="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 12h6V9M23 12h-4M9 20h4l3 3h7M16 16h7" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="16" r="2" fill="var(--accent)"/></svg>
+    <div><b>Мастерская ПК</b><span>Тренажёр ПК · <b>By Xtedo ВТ-79</b></span></div>
+  </div>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Разделы">
+    <button class="tab" role="tab" data-view="lab"><svg viewBox="0 0 24 24"><path d="M12 2.5 3.5 7v10L12 21.5 20.5 17V7zM3.5 7 12 11.5 20.5 7M12 11.5v10"/></svg>Лаборатория</button>
+    <button class="tab" role="tab" data-view="build"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Сборка</button>
+    <button class="tab" role="tab" data-view="diag"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>Диагностика</button>
+    <button class="tab" role="tab" data-view="quiz"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17v.01"/></svg>Тест</button>
+    <button class="tab" role="tab" data-view="rank"><svg viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M12 14v4M8 20h8"/></svg>Рейтинг</button>
+    <button class="tab" role="tab" data-view="wiki"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h5v17H6a2 2 0 0 0-2 2zM20 5a2 2 0 0 0-2-2h-5v17h5a2 2 0 0 1 2 2z"/></svg>Словарь</button>
+    <button class="tab" role="tab" data-view="prog"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Прогресс</button>
+  </nav>
+  <button class="btn icon" id="themeBtn" aria-label="Сменить тему"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+  <button class="btn sm" id="accBtn" aria-label="Профиль"></button>
+</div></header>
+
+<main class="layout">
+  <section class="stage" id="stage" aria-label="3D-модель компьютера">
+    <div class="gl" id="gl" tabindex="0" aria-label="Интерактивная 3D-модель. Стрелки вращают, плюс и минус меняют масштаб"></div>
+    <div class="hint" id="hint">тяни — вращать · колесо или щипок — масштаб · правая кнопка — сдвиг · клик — выбрать деталь</div>
+    <div class="tip" id="tip" hidden></div>
+    <div class="stageMsg" id="stageMsg" hidden></div>
+    <div class="tools" id="tools">
+      <label class="slider"><span>Разнести</span><input type="range" id="explode" min="0" max="100" value="0" aria-label="Степень разнесения деталей"></label>
+      <button class="tg" id="tgXray" aria-pressed="false">Рентген</button>
+      <button class="tg" id="tgPower" aria-pressed="false">Питание</button>
+      <button class="tg" id="tgSpin" aria-pressed="false">Вращение</button>
+      <button class="tg" id="tgReset">Сброс вида</button>
+      <button class="tg" id="tgBig" aria-pressed="false">Шире</button>
+    </div>
+  </section>
+  <section class="panel" id="panel">
+    <div class="view" id="v-lab"></div>
+    <div class="view" id="v-build"></div>
+    <div class="view" id="v-diag"></div>
+    <div class="view" id="v-quiz"></div>
+    <div class="view" id="v-rank"></div>
+    <div class="view" id="v-wiki"></div>
+    <div class="view" id="v-prog"></div>
+  </section>
+</main>
+<footer class="foot">Мастерская ПК · By <b>Xtedo</b> ВТ-79</footer>
+<div class="modal" id="modal" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitle" id="sheet"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* ===== DATA: components ===== */
+const PARTS=[
+{id:'case',n:'Корпус',g:'Основа',
+ role:'Каркас компьютера: защищает компоненты, крепит их и организует поток воздуха. Передняя панель выводит кнопку питания, USB и аудио.',
+ fail:'Пыль и плохая вентиляция, замыкание из-за лишней стойки, сломанные коннекторы передней панели, перепутанные провода кнопки.',
+ check:'Осмотр с фонариком, проверка стоек, коннекторов F_PANEL по схеме из руководства платы.',
+ tip:'Приток воздуха должен быть чуть сильнее вытяжки: так в корпус меньше засасывается пыль через щели.'},
+{id:'standoffs',n:'Стойки для платы',g:'Основа',
+ role:'Латунные стойки поднимают материнскую плату над металлом корпуса, чтобы контакты на обратной стороне не замыкались.',
+ fail:'Лишняя стойка там, где в плате нет отверстия, может замкнуть дорожки: ПК не стартует или работает нестабильно.',
+ check:'Сверь положение стоек с отверстиями платы. Стойки ставят только под имеющиеся отверстия.',
+ tip:'Для формата ATX обычно хватает 6–9 стоек. Лишнюю стойку проще убрать до установки платы, чем искать причину после.'},
+{id:'mobo',n:'Материнская плата',g:'Основа',
+ role:'Соединяет все компоненты. Содержит сокет процессора, слоты памяти и PCIe, чипсет, цепи питания процессора (VRM) и микросхему BIOS/UEFI.',
+ fail:'Вздувшиеся конденсаторы, погнутые контакты сокета, нет дежурного питания, не проходит POST.',
+ check:'Диагностические светодиоды (CPU, DRAM, VGA, BOOT), POST-код, визуальный осмотр, замена по принципу «известно исправного».',
+ tip:'Плату меняют в последнюю очередь, когда исключены БП, память, процессор и видеокарта.'},
+{id:'cpu',n:'Процессор (CPU)',g:'Вычисления',
+ role:'Выполняет программы и вычисления. Тепловыделение процессора отводит кулер.',
+ fail:'Перегрев и троттлинг (частота падает), самовыключение при температуре около 95–100 °C, погнутые контакты сокета LGA.',
+ check:'Температуры и частоты в HWiNFO или HWMonitor, стресс-тест (OCCT, Prime95), осмотр сокета.',
+ tip:'Под нагрузкой для большинства десктопных процессоров нормально до 80–85 °C. Точный предел смотри в документации модели.'},
+{id:'cooler',n:'Кулер процессора',g:'Охлаждение',
+ role:'Радиатор и вентилятор отводят тепло от процессора. Термопаста заполняет микронеровности между крышкой процессора и подошвой кулера.',
+ fail:'Шум подшипника, остановка вентилятора, пыль в рёбрах радиатора, засохшая паста: температура растёт.',
+ check:'Обороты вентилятора в BIOS, температуры, осмотр рёбер, при подозрении на пасту — снять кулер.',
+ tip:'Хватает горошины пасты с рисовое зерно. Перед установкой снимай защитную плёнку с подошвы кулера.'},
+{id:'ram',n:'Оперативная память (RAM)',g:'Память',
+ role:'Быстрая временная память для запущенных программ. Две планки в правильных слотах включают двухканальный режим.',
+ fail:'Синие экраны, самопроизвольные перезагрузки, сигналы при старте, ПК не проходит POST.',
+ check:'MemTest86 с флешки для каждой планки отдельно, перестановка в другой слот, чистка контактов.',
+ tip:'Для двух планок обычно используют слоты A2 и B2, но схема в руководстве платы важнее. Планка встаёт до щелчка с обеих сторон.'},
+{id:'ssd',n:'NVMe SSD (M.2)',g:'Память',
+ role:'Быстрый накопитель на шине PCIe. Хранит систему и программы, загрузка Windows занимает секунды.',
+ fail:'Диск пропадает в BIOS, падает скорость записи, ошибки файловой системы, перегрев без радиатора.',
+ check:'SMART в CrystalDiskInfo, определение в BIOS, температура, обновление прошивки.',
+ tip:'Фиксируй планку единственным винтом без усилия. После установки в BIOS диск должен определиться.'},
+{id:'bat',n:'Батарейка CMOS (CR2032)',g:'Основа',
+ role:'Питает часы и хранит настройки BIOS, когда ПК выключен из розетки.',
+ fail:'Сбивается дата и время, слетают настройки BIOS, сообщение «CMOS checksum error».',
+ check:'Мультиметром: исправная батарейка даёт 3,0 В и выше, ниже 2,8 В — пора менять.',
+ tip:'Меняй батарейку при отключённом от сети ПК. Ставь только CR2032, «плюсом» вверх.'},
+{id:'psu',n:'Блок питания (БП)',g:'Питание',
+ role:'Преобразует 220 В из розетки в напряжения +12 В, +5 В и +3,3 В для компонентов.',
+ fail:'ПК не включается, выключается под нагрузкой, запах гари, свист и гул.',
+ check:'Мультиметр на разъёмах: +12 В в пределах 11,4–12,6 В, +5 В — 4,75–5,25 В, +3,3 В — 3,14–3,47 В. Тест скрепкой (замыкание PS_ON и GND) проверяет запуск без платы.',
+ tip:'Корпус БП не вскрывают: конденсаторы хранят опасный заряд даже после отключения от сети.'},
+{id:'gpu',n:'Видеокарта (GPU)',g:'Вычисления',
+ role:'Обрабатывает графику и выводит изображение на монитор. Устанавливается в слот PCIe x16 и питается отдельными кабелями.',
+ fail:'Артефакты на экране, нет картинки, перегрев, шум вентиляторов, перезагрузки в играх.',
+ check:'Переустановка карты, проверка питающих кабелей PCIe, другой видеовыход, мониторинг температуры.',
+ tip:'Кабель монитора подключай к видеокарте, а не к материнской плате, если карта установлена.'},
+{id:'hdd',n:'Жёсткий диск (HDD)',g:'Память',
+ role:'Механический накопитель большого объёма на магнитных пластинах. Медленнее SSD, но дешевле за гигабайт.',
+ fail:'Щелчки, зависания, загрузка диска 100%, битые секторы.',
+ check:'SMART: Reallocated Sector Count и Current Pending Sector. Рост этих значений говорит о деградации.',
+ tip:'Если диск щёлкает, сначала копируй данные, а не запускай проверки поверхности, они сильно нагружают диск.'},
+{id:'fanF',n:'Передний вентилятор',g:'Охлаждение',
+ role:'Забирает прохладный воздух снаружи и подаёт его внутрь корпуса.',
+ fail:'Шум подшипника, остановка, пыль на фильтре.',
+ check:'Обороты в BIOS или утилите, чистка фильтра, проверка питания разъёма.',
+ tip:'Стрелки на раме вентилятора показывают направление потока и вращения.'},
+{id:'fanR',n:'Задний вентилятор',g:'Охлаждение',
+ role:'Выбрасывает горячий воздух из корпуса. Вместе с передним создаёт сквозной поток.',
+ fail:'Загрязнение лопастей, шум, остановка.',
+ check:'Обороты в BIOS, осмотр, продувка со стопором лопастей.',
+ tip:'При продувке сжатым воздухом придерживай лопасти: раскрутка выше номинала может повредить подшипник.'},
+{id:'c24',n:'Кабель 24-pin ATX',g:'Кабели',
+ role:'Главный кабель питания материнской платы: линии +3,3 В, +5 В, +12 В и сигнал включения.',
+ fail:'Плохо вставленный разъём: ПК не стартует или перезагружается.',
+ check:'Убедись, что защёлка встала на место, проверь контакты на подгоревшие.',
+ tip:'Вставляй обеими руками и дави ровно до щелчка: разъём тугой.'},
+{id:'c8',n:'Кабель питания CPU (EPS 8-pin)',g:'Кабели',
+ role:'Подаёт питание +12 В на процессор через цепи VRM материнской платы.',
+ fail:'Забыли подключить: нет старта или ПК сразу выключается.',
+ check:'Проверь, что разъём стоит в гнезде CPU, а не в гнезде PCIe.',
+ tip:'Не путай с кабелем видеокарты: ключи разъёмов разные, силой ничего не вставляют.'},
+{id:'cgpu',n:'Кабель питания видеокарты (PCIe)',g:'Кабели',
+ role:'Добавляет питание +12 В видеокарте сверх того, что даёт слот.',
+ fail:'Нет питания: карта не запускается, шумит на максимуме, на экране предупреждение драйвера.',
+ check:'Проверь, что все разъёмы на карте заняты и сидят до щелчка.',
+ tip:'Для мощных видеокарт используй отдельные кабели от БП, а не один кабель-разветвитель.'},
+{id:'csata',n:'SATA-кабель данных',g:'Кабели',
+ role:'Передаёт данные между жёстким диском и материнской платой. Питание диска идёт по отдельному кабелю.',
+ fail:'Перегиб или неплотный контакт: диск пропадает, система тормозит или не грузится.',
+ check:'Переставь кабель, возьми другой порт SATA и другой кабель.',
+ tip:'У надёжных кабелей есть защёлки. Не тяни за провод, тяни за разъём.'}
+];
+const PARTMAP=Object.fromEntries(PARTS.map(p=>[p.id,p]));
+
+/* ===== DATA: assembly (part appears at step) ===== */
+const ASSEMBLY=[
+{part:'case',z:10,title:'Подготовка рабочего места',text:'Разложи инструменты, сними обе боковые панели корпуса и положи корпус на стол. Распакуй все компоненты, но держи их в антистатических пакетах до установки.',warn:'Сними статическое электричество: надень антистатический браслет или перед работой коснись металлического корпуса ПК, отключённого от сети.',tools:['Отвёртка PH2','Антистатический браслет','Стяжки','Фонарик']},
+{part:'standoffs',z:6,title:'Стойки под материнскую плату',text:'Вкрути стойки в те отверстия корпуса, которые совпадают с отверстиями твоей материнской платы. Для формата ATX это 6–9 стоек.',warn:'Лишняя стойка там, где в плате нет отверстия, может замкнуть дорожки.',tools:['Торцевой ключ или пальцы']},
+{part:'mobo',also:['bat'],z:7,title:'Установка материнской платы',text:'Совмести порты с заглушкой I/O на задней стенке, опусти плату на стойки и закрути винты крест-накрест без усилия. Батарейка CR2032 уже стоит на плате.',warn:'Опытные сборщики ставят процессор, кулер и память на плату ещё вне корпуса, так удобнее. Здесь порядок выбран для наглядности.',tools:['Отвёртка PH2','Винты M3']},
+{part:'cpu',z:4,title:'Установка процессора',text:'Подними рычаг сокета, совмести золотой треугольник на процессоре с меткой сокета, опусти процессор без нажима и зафиксируй рычаг.',warn:'Никогда не вдавливай процессор силой: так гнутся контакты. Касайся только краёв.',tools:['Чистые сухие руки']},
+{part:'cooler',z:5,title:'Кулер и термопаста',text:'Нанеси на крышку процессора каплю пасты размером с рисовое зерно, установи кулер и закрепи крест-накрест. Подключи провод вентилятора к разъёму CPU_FAN.',warn:'Снимай защитную плёнку с подошвы кулера. Слишком много пасты не улучшает охлаждение.',tools:['Термопаста','Отвёртка PH2']},
+{part:'ram',z:4.5,title:'Оперативная память',text:'Открой защёлки слотов, вставь планки в слоты A2 и B2 (проверь схему в руководстве) и надави до щелчка с обеих сторон.',warn:'Планка вставляется одним способом: ключ в контактной группе должен совпасть с выступом слота.',tools:['Руководство платы']},
+{part:'ssd',z:4,title:'NVMe SSD (M.2)',text:'Вставь SSD в слот M.2 под небольшим углом, прижми и зафиксируй одним винтом. Если у платы есть радиатор для M.2, сними плёнку с термопрокладки.',warn:'Винт затягивай без усилия: маленькая шляпка легко срывается.',tools:['Маленькая отвёртка PH0']},
+{part:'psu',z:8,title:'Блок питания',text:'Установи БП в нижний отсек вентилятором вниз (если у корпуса есть решётка снизу) и закрути четыре винта на задней стенке.',warn:'Пока не подключай БП к розетке и не вставляй кабели в сеть, это делается в самом конце.',tools:['Отвёртка PH2','Винты БП']},
+{part:'gpu',z:7,title:'Видеокарта',text:'Сними заглушки задней стенки, вставь карту в верхний слот PCIe x16 до щелчка защёлки и закрепи винтами на планке.',warn:'Тяжёлую карту придерживай снизу, пока не закрутишь винты, чтобы не повредить слот.',tools:['Отвёртка PH2']},
+{part:'fanR',z:7,title:'Задний вентилятор',text:'Закрепи вентилятор на задней стенке так, чтобы поток воздуха шёл из корпуса наружу. Подключи кабель к разъёму SYS_FAN.',warn:'Смотри на стрелки на раме: они показывают направление потока воздуха.',tools:['Отвёртка PH2','Винты']},
+{part:'fanF',z:7,title:'Передний вентилятор',text:'Закрепи вентилятор спереди, воздух должен идти внутрь корпуса. Подключи к SYS_FAN. Теперь у корпуса есть сквозной поток.',warn:'Оба вентилятора должны работать на одно направление потока, а не друг против друга.',tools:['Отвёртка PH2','Винты']},
+{part:'hdd',z:7,title:'Жёсткий диск',text:'Установи HDD в 3,5-дюймовую корзину и закрепи винтами. Он нужен для больших архивов, систему лучше держать на SSD.',warn:'Диск боится ударов, особенно во время работы. Ставь его аккуратно.',tools:['Отвёртка PH2','Винты']},
+{part:'c24',z:6,title:'Кабель 24-pin',text:'Подключи основной кабель питания к 24-контактному разъёму на правой стороне материнской платы. Защёлка должна встать на место.',warn:'Разъём тугой. Дави обеими руками ровно, без перекосов.',tools:[]},
+{part:'c8',z:6,title:'Питание процессора (EPS)',text:'Подключи кабель 8-pin (4+4) EPS к разъёму у верхнего края платы возле процессора.',warn:'Это не кабель видеокарты. EPS и PCIe разъёмы не взаимозаменяемы, даже если форма похожа.',tools:[]},
+{part:'cgpu',z:6,title:'Питание видеокарты',text:'Подключи кабель PCIe к разъёму на видеокарте. Для мощных карт используй отдельные кабели от БП.',warn:'Если разъём не стоит до щелчка, карта может не запуститься или сбрасывать частоты.',tools:[]},
+{part:'csata',z:6,title:'SATA-кабель для HDD',text:'Соедини жёсткий диск с портом SATA материнской платы кабелем данных, а питание подведи отдельным кабелем от БП.',warn:'Не изгибай кабель на резком углу и не дёргай за провод.',tools:['Стяжки']},
+{part:null,z:10,title:'Первое включение',text:'Проложи кабели стяжками, закрой панели, подключи монитор к видеокарте и шнур питания. Нажми кнопку включения: вентиляторы должны закрутиться, а на экране появиться логотип производителя платы.',warn:'Если нет картинки, не паникуй: открой раздел «Диагностика» и попробуй сценарий «Чёрный экран».',tools:['Монитор','Кабель HDMI или DisplayPort','Шнур питания']}
+];
+
+/* ===== DATA: glossary ===== */
+const GLOSSARY=[
+{t:'POST',c:'Диагностика',d:'Power-On Self-Test. Самотест компьютера при включении: BIOS проверяет процессор, память, видеокарту. Ошибки сообщаются сигналами или кодами.'},
+{t:'BIOS / UEFI',c:'Диагностика',d:'Микропрограмма материнской платы. Запускает оборудование, хранит настройки и передаёт управление операционной системе.'},
+{t:'CMOS',c:'Питание',d:'Небольшая память настроек BIOS и часов. Питается от батарейки CR2032.'},
+{t:'POST-код',c:'Диагностика',d:'Двузначный шестнадцатеричный код на дисплее платы. Показывает, на каком этапе остановилась загрузка.'},
+{t:'VRM',c:'Питание',d:'Voltage Regulator Module. Цепи на плате, которые превращают 12 В в низкое напряжение для процессора.'},
+{t:'PSU / БП',c:'Питание',d:'Блок питания. Преобразует сетевое напряжение в +12 В, +5 В и +3,3 В.'},
+{t:'EPS',c:'Питание',d:'Разъём питания процессора 8-pin (4+4). Не путать с PCIe-разъёмом видеокарты.'},
+{t:'PCIe',c:'Накопители',d:'Высокоскоростная шина для видеокарт, NVMe-накопителей и плат расширения.'},
+{t:'NVMe',c:'Накопители',d:'Протокол быстрых SSD на шине PCIe. Намного быстрее SATA.'},
+{t:'M.2',c:'Накопители',d:'Компактный разъём для SSD и других модулей. Накопитель крепится одним винтом.'},
+{t:'SATA',c:'Накопители',d:'Интерфейс для HDD и 2,5-дюймовых SSD. Данные и питание идут по разным кабелям.'},
+{t:'HDD',c:'Накопители',d:'Жёсткий диск с вращающимися магнитными пластинами.'},
+{t:'SMART',c:'Диагностика',d:'Система самодиагностики накопителей. Показывает счётчики ошибок и износа.'},
+{t:'Троттлинг',c:'Процессор',d:'Принудительное снижение частоты процессора при перегреве, чтобы защитить его.'},
+{t:'TDP',c:'Процессор',d:'Тепловая мощность, на которую рассчитан кулер. Не равна реальному потреблению, но показывает класс охлаждения.'},
+{t:'Термопаста',c:'Процессор',d:'Теплопроводящая масса между процессором и кулером, заполняет микронеровности.'},
+{t:'Сокет',c:'Процессор',d:'Разъём на плате для процессора. Определяет, какие процессоры подойдут (LGA1700, AM5 и другие).'},
+{t:'Двухканальный режим',c:'Память',d:'Две планки RAM работают параллельно и дают больше пропускной способности. Включается при установке в нужные слоты.'},
+{t:'XMP / EXPO',c:'Память',d:'Профили разгона памяти. Иногда вызывают нестабильность, и тогда помогает сброс к штатной частоте.'},
+{t:'MemTest86',c:'Диагностика',d:'Программа для проверки памяти. Запускается с флешки до загрузки системы.'},
+{t:'BSOD',c:'Диагностика',d:'Синий экран смерти Windows. Показывает стоп-код, по которому ищут причину сбоя.'},
+{t:'ESD',c:'Безопасность',d:'Электростатический разряд. Незаметный для человека удар может повредить микросхемы.'},
+{t:'Заземление',c:'Безопасность',d:'Снятие статического потенциала с тела: антистатический браслет или касание металлического корпуса.'},
+{t:'Мультиметр',c:'Диагностика',d:'Прибор для измерения напряжения, сопротивления и проверки цепи на обрыв.'},
+{t:'Клонирование диска',c:'Накопители',d:'Копирование всего диска на другой накопитель вместе с системой и загрузочной областью.'}
+];
+
+/* ===== DATA: scenarios (1-4). option = [label, result, nextNode|null, isGood] ===== */
+const SCEN1=[
+{id:'nopower',n:'Тишина',lvl:1,min:5,hl:['psu'],
+ sym:'Не включается вообще: ни света, ни вентиляторов.',
+ ticket:'Клиент: «Вчера чистил системник от пыли. Сегодня нажимаю кнопку, а ПК молчит. Света нет, вентиляторы не крутятся».',
+ start:'a',nodes:{
+ a:{t:'Компьютер полностью обесточен. С чего начнёшь диагностику?',hl:['psu'],o:[
+  ['Проверить розетку, шнур и тумблер на задней стенке БП','Шнур вставлен плотно, розетка работает. Тумблер на БП стоит в положении «O». Переводишь в «I»: на материнской плате загорается дежурный светодиод, но по кнопке ПК не стартует.','b',1],
+  ['Сразу заменить блок питания','Дорогое решение без проверки: ты ещё не знаешь, что неисправно. Сначала исключают внешние причины.',null,0],
+  ['Сбросить BIOS, вынув батарейку','Пока нет питания, BIOS не работает, сброс ничего не изменит.',null,0]]},
+ b:{t:'Дежурное питание есть, но ПК не стартует по кнопке. Что проверишь?',hl:['mobo','case'],o:[
+  ['Замкнуть контакты PWR_SW на F_PANEL отвёрткой','ПК запустился. Плата и БП исправны, проблема в кнопке или её коннекторе.','c',1],
+  ['Заменить оперативную память','Дежурное питание есть, плата, скорее всего, жива. Память не влияет на реакцию на кнопку.',null,0],
+  ['Заменить материнскую плату','Рано: сначала исключи простое — кнопку и её кабель.',null,0]]},
+ c:{t:'Замыкание контактов запускает ПК. Куда смотреть дальше?',hl:['case'],o:[
+  ['Осмотреть коннектор PWR_SW на F_PANEL','Коннектор сидит со сдвигом на один контакт после чистки. Ставишь по схеме из руководства платы, и кнопка работает.','end',1],
+  ['Переустановить Windows','Система не при чём: ПК даже не включается кнопкой.',null,0],
+  ['Купить новый корпус','Не доказано, что виновата кнопка корпуса. Сначала проверь кабель.',null,0]]},
+ end:{end:1,t:'Причина найдена: тумблер БП после чистки был выключен, а коннектор кнопки сместился.',lesson:'После обслуживания проверяй сначала внешнее питание и тумблер, затем кнопку и разъём F_PANEL. Расположение контактов всегда сверяй по схеме платы.'}}},
+
+{id:'nodisplay',n:'Чёрный экран',lvl:1,min:6,hl:['gpu','ram'],
+ sym:'Вентиляторы крутятся, монитор пишет «Нет сигнала».',
+ ticket:'Клиент: «Собрал новый ПК. Всё шумит, лампочки горят, но на мониторе только «Нет сигнала»».',
+ start:'a',nodes:{
+ a:{t:'ПК включается, но картинки нет. Что проверишь первым?',hl:['gpu'],o:[
+  ['Проверить кабель, вход монитора и разъём на видеокарте','Монитор исправен, кабель целый, подключён в видеокарту. На материнской плате горит светодиод DRAM.','b',1],
+  ['Заменить видеокарту','Рано: ты ещё не знаешь, на каком этапе остановилась загрузка.',null,0],
+  ['Переустановить Windows','Система не загрузилась бы и без монитора, а ПК не дошёл до загрузки.',null,0]]},
+ b:{t:'Горит светодиод DRAM. Что он означает и что делаешь?',hl:['mobo','ram'],o:[
+  ['Прочитать диагностические светодиоды по руководству платы','DRAM указывает на проблему с памятью: планка не распознана или плохо вставлена.','c',1],
+  ['Сразу менять видеокарту','Светодиод показывает на память, видеокарта здесь ни при чём.',null,0],
+  ['Обновить BIOS наугад','Без POST платформа может не принять обновление. Начни с простых причин.',null,0]]},
+ c:{t:'Планки памяти вставлены на вид ровно. Как действуешь?',hl:['ram'],o:[
+  ['Вынуть планки и вставить заново до щелчка в слоты A2 и B2','Одна из планок сидела неполностью. После переустановки светодиод погас, на экране появился логотип платы.','end',1],
+  ['Заменить процессор','Процессор исправен, память — причина.',null,0],
+  ['Купить новый монитор','Монитор исправен, картинка появилась сразу после переустановки памяти.',null,0]]},
+ end:{end:1,t:'Планка памяти была вставлена не до конца, из-за этого ПК не проходил POST.',lesson:'Диагностические светодиоды платы сокращают поиск: DRAM — память, VGA — видеокарта, BOOT — накопитель, CPU — процессор. Сначала перестановка, потом замена.'}}},
+
+{id:'beeps',n:'Писк при старте',lvl:2,min:7,hl:['ram','mobo'],
+ sym:'После включения несколько коротких сигналов, дальше чёрный экран.',
+ ticket:'Клиент: «При включении ПК пищит три раза коротко и дальше ничего не происходит».',
+ start:'a',nodes:{
+ a:{t:'ПК издаёт три коротких сигнала. Как узнать, что они значат?',hl:['mobo'],o:[
+  ['Определить производителя BIOS и сверить сигнал с таблицей в руководстве платы','Если BIOS от AMI, три коротких сигнала означают ошибку оперативной памяти. Таблицы у разных производителей различаются, так что сверка по руководству обязательна.','b',1],
+  ['Считать сигналы обычным «приветствием»','Сигналы — это код ошибки POST, их нельзя игнорировать.',null,0],
+  ['Переустановить Windows','ПК не доходит до загрузки системы, поэтому Windows тут ни при чём.',null,0]]},
+ b:{t:'Сигнал указывает на память. В платформе установлено две планки. Как поступишь?',hl:['ram'],o:[
+  ['Оставить одну планку в слоте A2 и проверить запуск','С одной планкой ПК загрузился, значит, слот и платформа рабочие.','c',1],
+  ['Заменить материнскую плату','Слишком дорогой шаг без разделения причин.',null,0],
+  ['Заменить блок питания','Питание не при чём: плата успешно дошла до проверки памяти.',null,0]]},
+ c:{t:'С первой планкой ПК грузится. Вторую планку проверяешь отдельно: три сигнала возвращаются. Вывод?',hl:['ram'],o:[
+  ['Вторая планка неисправна, заменить по гарантии','Подтверждено: с этой планкой ПК не проходит POST, во всех слотах.','end',1],
+  ['Заменить материнскую плату','Первая планка работает в том же слоте, плата рабочая.',null,0],
+  ['Заменить процессор','Контроллер памяти исправен, проблема в самой планке.',null,0]]},
+ end:{end:1,t:'Неисправная планка оперативной памяти найдена и заменена.',lesson:'Коды сигналов зависят от производителя BIOS. Чтобы найти неисправный модуль, оставляй по одной планке и проверяй каждую и каждый слот отдельно.'}}},
+
+{id:'overheat',n:'Горячий и громкий',lvl:2,min:8,hl:['cpu','cooler','fanF','fanR'],
+ sym:'Выключается в играх через 10 минут, кулер ревёт.',
+ ticket:'Клиент: «В играх через 10 минут ПК выключается. Вентилятор гудит как турбина».',
+ start:'a',nodes:{
+ a:{t:'ПК выключается под нагрузкой. Как получить факты?',hl:['cpu'],o:[
+  ['Запустить мониторинг температур (HWiNFO) под нагрузкой','Процессор разогревается до 97 °C при 3100 об/мин вентилятора, частота падает: это троттлинг.','b',1],
+  ['Заменить процессор','Рано: температура и причины неизвестны.',null,0],
+  ['Заменить блок питания','Выключение из-за перегрева выглядит так же, но сначала проверь температуру.',null,0]]},
+ b:{t:'97 °C при максимальных оборотах кулера. Что смотришь дальше?',hl:['cooler','case'],o:[
+  ['Открыть корпус и осмотреть кулер и пылевые фильтры','Радиатор забит войлоком пыли, воздух сквозь него почти не проходит.','c',1],
+  ['Отключить защиту от перегрева в BIOS','Опасно: защита спасает процессор от повреждения.',null,0],
+  ['Добавить ещё оперативной памяти','Память не влияет на температуру процессора.',null,0]]},
+ c:{t:'Радиатор забит пылью. Как правильно чистить?',hl:['cooler','fanF','fanR'],o:[
+  ['Выключить ПК, отключить шнур, продуть сжатым воздухом, придерживая лопасти; заменить пасту','Температура под нагрузкой — 68 °C, ПК стабильно работает.','end',1],
+  ['Пылесосить включённый ПК','Пылесос создаёт статику и раскручивает вентиляторы.',null,0],
+  ['Протереть платы влажной тряпкой','Влага и электроника несовместимы.',null,0]]},
+ end:{end:1,t:'Перегрев устранён: температура упала с 97 до 68 °C.',lesson:'Придерживай лопасти при продувке: вентилятор, раскрученный воздухом, работает как генератор и может выйти из строя. Пасту обновляют раз в 2–4 года.'}}}
+];
+
+/* ===== DATA: scenarios (5-8) ===== */
+const SCEN2=[
+{id:'bsod',n:'Синий экран',lvl:3,min:9,hl:['ram'],
+ sym:'После установки второй планки Windows падает с кодом MEMORY_MANAGEMENT.',
+ ticket:'Клиент: «Докупил вторую планку памяти. Теперь через час работы синий экран, внизу написано MEMORY_MANAGEMENT».',
+ start:'a',nodes:{
+ a:{t:'Синие экраны начались после установки памяти. Первое действие?',hl:['ram'],o:[
+  ['Записать стоп-код и время и сверить с журналом событий Windows','Стоп-код 0x0000001A MEMORY_MANAGEMENT, первые сбои совпадают с днём установки второй планки.','b',1],
+  ['Переустановить драйверы всех устройств разом','Это размытый шаг: сначала нужно понять причину по коду.',null,0],
+  ['Заменить SSD','Диск не связан с кодом, который указывает на память.',null,0]]},
+ b:{t:'Код указывает на память. Что запустишь?',hl:['ram'],o:[
+  ['MemTest86 с флешки: сначала каждая планка по отдельности, потом обе вместе','Планка A: 0 ошибок. Планка B: 0 ошибок. Обе вместе: ошибки на 2 проходе.','c',1],
+  ['Проверить диск командой chkdsk','chkdsk ищет ошибки файловой системы и не тестирует память.',null,0],
+  ['Обновить Windows','Обновления не лечат аппаратные ошибки памяти.',null,0]]},
+ c:{t:'Каждая планка исправна отдельно, но вместе ошибки. Что вероятнее всего?',hl:['ram','mobo'],o:[
+  ['Несовместимость планок в паре: выставить штатную частоту (отключить XMP) или поставить совместимый комплект','С отключённым XMP и частотой по умолчанию тест проходит без ошибок.','end',1],
+  ['Заменить процессор','Каждая планка работает отдельно, значит, контроллер памяти исправен.',null,0],
+  ['Разогнать память ещё сильнее','Разгон увеличивает нестабильность, а не уменьшает.',null,0]]},
+ end:{end:1,t:'Две планки разных комплектов не держали профиль XMP. На штатной частоте система стабильна.',lesson:'Память лучше покупать комплектом. Если добавляешь планку к старой, начни с проверки каждой отдельно, а потом вместе, при необходимости сбрасывая XMP.'}}},
+
+{id:'slowhdd',n:'Тормозит как в 2005',lvl:2,min:7,hl:['hdd','ssd'],
+ sym:'Очень долгая загрузка, диск загружен на 100%.',
+ ticket:'Клиент: «ПК семь лет. Загружается шесть минут. В диспетчере задач диск на 100%, даже когда ничего не запущено».',
+ start:'a',nodes:{
+ a:{t:'Система еле двигается. Что проверишь первым?',hl:['hdd'],o:[
+  ['Диспетчер задач и SMART диска в CrystalDiskInfo','Диск загружен на 100% в простое. SMART: «Тревога», Reallocated Sectors = 412, Pending = 28.','b',1],
+  ['Добавить оперативной памяти','Загрузка диска 100% не лечится памятью, пока не выяснена причина.',null,0],
+  ['Сразу дефрагментировать диск','Дефрагментация сильно нагружает ослабший диск и может его добить.',null,0]]},
+ b:{t:'SMART показывает деградацию диска. Что делаешь прежде всего?',hl:['hdd'],o:[
+  ['Сделать резервную копию важных данных','Копируешь документы и фотографии. Диск работает, но заметно медленнее.','c',1],
+  ['Запустить полную проверку поверхности','Долгая проверка нагружает умирающий диск и может его добить до копирования данных.',null,0],
+  ['Отформатировать диск','Форматирование уничтожит данные клиента.',null,0]]},
+ c:{t:'Данные сохранены. Как вернуть скорость?',hl:['ssd','hdd'],o:[
+  ['Клонировать систему на SSD, а старый HDD оставить для архива','Загрузка Windows — 18 секунд. SMART нового диска чистый.','end',1],
+  ['Чистая установка Windows на тот же диск','На деградирующем диске проблема вернётся.',null,0],
+  ['Заменить SATA-кабель','Кабель исправен. Причина в самом диске, это показал SMART.',null,0]]},
+ end:{end:1,t:'Система перенесена на SSD, загрузка стала в двадцать раз быстрее.',lesson:'Тревожные значения SMART (переназначенные и нестабильные секторы) означают: сначала копируй данные, потом решай, что делать с диском.'}}},
+
+{id:'cmos',n:'Время сбилось',lvl:1,min:5,hl:['bat','mobo'],
+ sym:'Дата и время сбрасываются, при старте CMOS checksum error.',
+ ticket:'Клиент: «Каждое утро время сбрасывается на 2020 год. При старте ругается на CMOS».',
+ start:'a',nodes:{
+ a:{t:'Дата и настройки BIOS слетают после выключения. Какая причина вероятнее?',hl:['bat'],o:[
+  ['Села батарейка CMOS: измерить напряжение мультиметром','CR2032 даёт 2,1 В. Исправная — 3,0 В и выше.','b',1],
+  ['Вирус в Windows','Время сбрасывает BIOS, а он работает до загрузки Windows.',null,0],
+  ['Неисправный блок питания','БП не хранит время при выключенном ПК, это работа батарейки.',null,0]]},
+ b:{t:'Батарейка села. Как заменить безопасно?',hl:['bat','psu'],o:[
+  ['Отключить ПК от сети, снять батарейку, поставить новую CR2032 «плюсом» вверх','Новая батарейка стоит на месте, ПК включается.','c',1],
+  ['Заменить, не выключая ПК из сети','Остаётся дежурное питание платы, это небезопасно для платы.',null,0],
+  ['Поставить любую подходящую по размеру: CR1220 или CR2025','Размер и ёмкость другие: контакт и срок службы будут хуже.',null,0]]},
+ c:{t:'Батарейка заменена. Что остаётся сделать?',hl:['mobo'],o:[
+  ['Войти в BIOS, выставить дату и время, порядок загрузки и сохранить настройки','Дата сохраняется и после полного отключения от сети.','end',1],
+  ['Переустановить Windows','Систему переустанавливать не нужно: слетели настройки BIOS.',null,0],
+  ['Ничего: настройки восстановятся сами','Настройки BIOS после сброса не возвращаются, их нужно ввести заново.',null,0]]},
+ end:{end:1,t:'Батарейка заменена, дата и настройки BIOS сохраняются.',lesson:'Батарейка CMOS служит 3–6 лет. Перед заменой отключай ПК от сети и после замены вручную выставляй настройки BIOS.'}}},
+
+{id:'nodisk',n:'Диск не найден',lvl:2,min:7,hl:['hdd','csata','ssd'],
+ sym:'Operating System not found, Reboot and select proper boot device.',
+ ticket:'Клиент: «После того как перенесли ПК в другую комнату, пишет Operating System not found».',
+ start:'a',nodes:{
+ a:{t:'ПК не находит операционную систему. Что проверишь?',hl:['mobo'],o:[
+  ['Зайти в BIOS: виден ли диск и какой порядок загрузки','В BIOS диск не определяется.','b',1],
+  ['Переустановить Windows','Нельзя переустановить систему на диск, которого не видно.',null,0],
+  ['Заменить блок питания','Остальные компоненты работают, ПК стартует. Начни с BIOS.',null,0]]},
+ b:{t:'BIOS не видит диск. Что дальше?',hl:['csata','hdd'],o:[
+  ['Проверить питание и SATA-кабель: переставить и взять другой порт или кабель','Кабель данных плохо сидел после переноса. Диск определился.','c',1],
+  ['Отформатировать диск','Форматирование убьёт данные, а причина не в разделах.',null,0],
+  ['Обновить BIOS','Обновление не нужно: диск пропал после переноса, причина механическая.',null,0]]},
+ c:{t:'Диск виден в BIOS, но загрузка всё ещё не идёт. Что поправишь?',hl:['mobo','hdd'],o:[
+  ['Выставить диск с системой первым в порядке загрузки (Boot Priority)','Диск выбран первым, Windows загрузилась.','end',1],
+  ['Отформатировать диск','Данные в порядке, их нельзя форматировать.',null,0],
+  ['Заменить материнскую плату','Плата исправна, нужно было только настроить порядок загрузки.',null,0]]},
+ end:{end:1,t:'Плохой контакт SATA-кабеля и сбитый порядок загрузки устранены.',lesson:'Если диск не виден в BIOS, ищи причину на аппаратном уровне: питание, кабель данных, порт. Только когда диск виден, переходи к загрузке.'}}}
+];
+const SCENARIOS=[...SCEN1,...SCEN2];
+
+/* ===== DATA: quiz [question, options, correctIndex, explanation] ===== */
+const QUIZ=[
+['Какое напряжение должно быть на линии +12 В блока питания в норме?',['11,4–12,6 В','8–9 В','13–15 В','5 В'],0,'Допуск линии +12 В составляет ±5%, то есть 11,4–12,6 В.'],
+['Что нужно сделать перед работой внутри ПК?',['Отключить от сети и снять статику','Включить ПК и ждать загрузки','Сразу снять процессор','Намочить руки'],0,'Отключи шнур питания и сними статическое электричество: ESD повреждает микросхемы.'],
+['Сколько термопасты наносят на процессор?',['Каплю размером с рисовое зерно','Весь процессор толстым слоем','Целый тюбик','Паста не нужна'],0,'Давление кулера растекает каплю. Лишняя паста не улучшает охлаждение.'],
+['Как правильно ставить две планки памяти для двухканального режима?',['В слоты по схеме платы (обычно A2 и B2)','Рядом в любые два слота','Одну в слот, другую в M.2','Планки нельзя ставить парой'],0,'Двухканальный режим включается только в нужных слотах, схема указана в руководстве платы.'],
+['О чём сообщают короткие сигналы при старте ПК?',['О результате самотеста POST','О завершении загрузки Windows','О поломке монитора','О включённом интернете'],0,'Коды POST зависят от производителя BIOS, их расшифровку ищи в руководстве платы.'],
+['Какой параметр SMART показывает переназначенные сектора?',['Reallocated Sector Count','Power On Hours','Temperature','Spin Up Time'],0,'Рост Reallocated Sector Count говорит об износе и ошибках поверхности диска.'],
+['Для чего нужна батарейка CMOS?',['Питает часы и хранит настройки BIOS','Питает вентиляторы','Заряжает монитор','Питает видеокарту'],0,'Без неё BIOS забывает дату и настройки после отключения от сети.'],
+['Каким разъёмом подключают питание процессора?',['EPS 8-pin (4+4)','SATA','Molex','24-pin ATX'],0,'EPS подаёт +12 В процессору. 24-pin питает саму плату.'],
+['Диск щёлкает и зависает. Что сделать первым делом?',['Скопировать важные данные','Запустить полную проверку поверхности','Отформатировать диск','Выключить и забыть'],0,'Сначала спасай данные: проверки нагружают умирающий диск и могут его добить.'],
+['Что показывает диагностический светодиод DRAM?',['Проблему с оперативной памятью','Перегрев процессора','Заряд батарейки','Скорость Wi-Fi'],0,'Светодиоды CPU, DRAM, VGA и BOOT показывают, на каком этапе остановился POST.'],
+['Какая температура процессора под нагрузкой считается нормальной у большинства моделей?',['Примерно до 80–85 °C','Около 120 °C','Около 100 °C постоянно','Ниже 20 °C'],0,'Точный предел зависит от модели, но стабильные 95 °C и выше — повод проверить охлаждение.'],
+['Почему нельзя вскрывать блок питания?',['Конденсаторы хранят опасное напряжение','Он станет тяжёлым','Это нарушает гарантию монитора','Он включится сам'],0,'Заряд в конденсаторах остаётся после отключения от сети и опасен для жизни.'],
+['Как проверить запуск БП без материнской платы?',['Замкнуть скрепкой PS_ON и GND на 24-pin','Подключить к телевизору','Нажать кнопку на мышке','Включить в 2 розетки'],0,'Замыкание PS_ON и GND имитирует сигнал включения. Вентилятор БП должен закрутиться.'],
+['Какую программу используют для проверки оперативной памяти?',['MemTest86','Photoshop','Chrome','Paint'],0,'MemTest86 запускают с флешки до загрузки системы.'],
+['Куда подключать монитор при установленной дискретной видеокарте?',['В видеокарту','В материнскую плату','В блок питания','В сетевую карту'],0,'Выходы материнской платы обычно работают только со встроенной графикой.'],
+['Сколько стоек ставят под материнскую плату?',['Только под имеющиеся в плате отверстия','Столько, сколько есть в корпусе','Не ставят вообще','Только одну в центре'],0,'Лишняя стойка может замкнуть дорожки на плате.'],
+['Чем NVMe SSD отличается от SATA SSD?',['Работает по шине PCIe и быстрее','Работает от батарейки','Не хранит данные','Имеет вращающиеся пластины'],0,'NVMe использует PCIe и даёт скорости в разы выше, чем SATA.'],
+['Что такое троттлинг процессора?',['Снижение частоты при перегреве','Разгон','Ускорение вентиляторов','Обновление BIOS'],0,'Процессор защищает себя от повреждения, снижая частоту при высокой температуре.'],
+['Какой воздушный поток в корпусе помогает уменьшить пыль внутри?',['Приток чуть сильнее вытяжки','Вытяжка намного сильнее притока','Без вентиляторов','Закрыть все отверстия'],0,'Избыточное давление выталкивает воздух через щели, а не засасывает пыль.'],
+['С чего начинается любой ремонт?',['Со сбора симптомов и воспроизведения проблемы','С замены деталей наугад','С переустановки Windows','С покупки нового ПК'],0,'Без фактов легко заменить исправную деталь. Диагностика идёт от простого к сложному.']
+];
+
+/* ===== 3D MODEL: builds the PC from primitives. Everything is authored in world coordinates; each part is a Group moved as a whole. ===== */
+function buildPC(){
+  const parts={}, leds=[], fans=[], edges=[];
+  let cur=null;
+  const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+  function part(id,dir){
+    const g=new THREE.Group(); g.userData.pid=id;
+    cur={id,g,mats:[],dir:dir||V(0,0,0),off:V(0,0,0),vis:true,alpha:1,xr:0,h:0,tw:null,ghost:false};
+    parts[id]=cur; return cur;
+  }
+  function mat(color,o={}){
+    const m=new THREE.MeshStandardMaterial({color,roughness:o.r??.55,metalness:o.m??.1});
+    if(o.led){m.emissive=new THREE.Color(o.led);m.emissiveIntensity=0;m.userData.led=true;leds.push(m)}
+    m.userData.o=1; cur.mats.push(m); return m;
+  }
+  function add(mesh,o={}){ if(o.skipPick) mesh.userData.skipPick=true; cur.g.add(mesh); return mesh; }
+  function B(w,h,d,color,x,y,z,o={}){
+    const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(color,o)); m.position.set(x,y,z); add(m,o);
+    if(o.edge){const l=new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry),new THREE.LineBasicMaterial({color:0x000000,transparent:true,opacity:.28}));l.material.userData.o=.28;l.position.copy(m.position);cur.mats.push(l.material);l.userData.skipPick=true;cur.g.add(l)}
+    return m;
+  }
+  function C(rt,rb,h,color,x,y,z,axis,o={}){
+    const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,24),mat(color,o)); m.position.set(x,y,z);
+    if(axis==='z')m.rotation.x=Math.PI/2; if(axis==='x')m.rotation.z=Math.PI/2; add(m,o); return m;
+  }
+  function tube(pts,color,r){
+    const c=new THREE.CatmullRomCurve3(pts.map(p=>V(...p)));
+    const m=new THREE.Mesh(new THREE.TubeGeometry(c,48,r||.055,8,false),mat(color,{r:.7}));add(m);return m;
+  }
+  function fan(r,color,x,y,z,axis,ledColor){
+    const f=new THREE.Group(); f.position.set(x,y,z);
+    const fm=mat(0x1b2023);
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(r,.035,10,44),fm);f.add(ring);
+    const s=r*2+.1,t=.05;
+    [[0,r+.05,s,t],[0,-r-.05,s,t],[r+.05,0,t,s],[-r-.05,0,t,s]].forEach(a=>{
+      const b=new THREE.Mesh(new THREE.BoxGeometry(a[2],a[3],.12),fm);b.position.set(a[0],a[1],0);f.add(b)});
+    const bl=new THREE.Group(),bm=mat(color,{r:.4});
+    for(let i=0;i<7;i++){
+      const p=new THREE.Group();p.rotation.z=i*Math.PI*2/7;
+      const b=new THREE.Mesh(new THREE.BoxGeometry(r*.8,r*.3,.012),bm);b.position.x=r*.5;b.rotation.x=.5;p.add(b);bl.add(p)}
+    const hub=new THREE.Mesh(new THREE.CylinderGeometry(r*.2,r*.2,.07,20),mat(0x0f1315));hub.rotation.x=Math.PI/2;bl.add(hub);
+    f.add(bl);
+    if(ledColor){const lr=new THREE.Mesh(new THREE.TorusGeometry(r*.88,.012,6,44),mat(0x111111,{led:ledColor}));f.add(lr)}
+    if(axis==='x')f.rotation.y=Math.PI/2; if(axis==='-y')f.rotation.x=Math.PI/2;
+    cur.g.add(f); fans.push({blades:bl,rec:cur}); return f;
+  }
+
+  /* case */
+  part('case');
+  B(4.3,4.9,.06,0x222a27,0,0,-1.0);
+  B(4.3,.06,2.1,0x2a3330,0,-2.45,0);
+  B(.06,4.9,2.1,0x1f2624,2.15,0,0,{});
+  C(.11,.11,.05,0x9aa5a0,2.2,2.0,.5,'x',{m:.6,led:0x5ff0c0});
+  const shell=new THREE.Mesh(new THREE.BoxGeometry(4.3,4.9,2.1),new THREE.MeshStandardMaterial({color:0x9fd0c4,transparent:true,opacity:.05,depthWrite:false,side:THREE.DoubleSide}));
+  shell.userData.skipPick=true; cur.g.add(shell);
+  const shellEdges=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(4.3,4.9,2.1)),new THREE.LineBasicMaterial({color:0x44564f,transparent:true,opacity:.9}));
+  shellEdges.userData.skipPick=true; shellEdges.material.userData.o=.9; cur.mats.push(shellEdges.material); cur.g.add(shellEdges); edges.push(shellEdges);
+
+  /* standoffs */
+  part('standoffs',V(0,0,.35));
+  [[-1.45,-.9],[1.25,-.9],[-1.45,2.0],[1.25,2.0],[-.1,.55],[-.1,-.9]].forEach(p=>C(.05,.05,.24,0xb08d3a,p[0],p[1],-.85,'z',{m:.8}));
+
+  /* motherboard */
+  part('mobo',V(0,0,.8));
+  B(3.0,3.2,.07,0x14332b,-.1,.55,-.7,{edge:1});
+  B(.62,.62,.06,0x8e9791,-.1,1.3,-.64,{m:.4});
+  [.72,.86,1.0,1.14].forEach(x=>B(.07,1.4,.12,0x2b2f33,x,1.35,-.6));
+  B(.7,.7,.1,0x30363a,.5,-.55,-.6,{m:.5});
+  B(.3,1.0,.25,0x3a4147,-.75,1.35,-.52,{m:.5});
+  B(1.2,.3,.25,0x3a4147,0,1.95,-.52,{m:.5});
+  B(1.6,.08,.14,0x23282b,-.5,.1,-.6);
+  B(.3,.1,.1,0x1c1f21,-1.3,2.05,-.61);
+  B(.14,.7,.14,0xe8e4d6,1.3,.45,-.6);
+  B(.25,.14,.1,0x1c1f21,1.2,-.62,-.6);
+  B(.14,.4,.12,0x1c1f21,-1.5,.3,-.62);
+  {let s=7;const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
+   const ex=[[-.1,1.3,.8,.8],[1.0,1.35,.6,1.6],[-.5,.1,1.8,.3],[-.1,.68,1.1,.4],[.5,-.55,.9,.9],[-.75,1.35,.5,1.2],[0,1.95,1.5,.5],[1.3,.45,.3,.9],[-1.3,2.05,.5,.3],[.45,-.35,.4,.4],[1.2,-.62,.4,.3]];
+   const inst=new THREE.InstancedMesh(new THREE.BoxGeometry(.06,.035,.02),mat(0x3a3f44,{m:.5}),90);const d=new THREE.Object3D();let n=0;
+   while(n<90){const x=-1.5+rnd()*2.8,y=-1+rnd()*3.1;
+    if(ex.some(e=>Math.abs(x-e[0])<e[2]/2+.06&&Math.abs(y-e[1])<e[3]/2+.06))continue;
+    d.position.set(x,y,-.655);d.rotation.z=rnd()<.5?0:Math.PI/2;d.updateMatrix();inst.setMatrixAt(n++,d.matrix)}
+   cur.g.add(inst)}
+
+  /* cpu */
+  part('cpu',V(0,.3,1.2));
+  B(.5,.5,.03,0x2f6a4b,-.1,1.3,-.595);
+  B(.38,.38,.04,0xb9c0c4,-.1,1.3,-.56,{m:.9,r:.25});
+
+  /* cooler */
+  part('cooler',V(0,.3,2.4));
+  B(.6,.6,.06,0x6d767a,-.1,1.3,-.51,{m:.8});
+  for(let i=0;i<18;i++)B(.9,1.1,.012,0xaab2b6,-.1,1.3,-.45+i*.028,{m:.8,r:.35});
+  [-.27,-.09,.09,.27].forEach(x=>C(.035,.035,1.5,0xc17f45,-.1+x,1.45,-.2,null,{m:.9}));
+  B(.92,1.12,.01,0x7b8387,-.1,1.3,.07,{m:.6});
+  fan(.4,0x31373b,-.1,1.3,.13,'z',0x4fcfdc);
+
+  /* ram */
+  part('ram',V(.5,.2,1.7));
+  [.86,1.14].forEach(x=>{
+    B(.03,1.38,.3,0x1e3a2c,x,1.35,-.39);
+    B(.02,1.3,.22,0x3a4046,x-.03,1.35,-.38,{m:.7});
+    B(.02,1.3,.22,0x3a4046,x+.03,1.35,-.38,{m:.7});
+    B(.07,1.3,.03,0x111111,x,1.35,-.225,{led:0x4fcfdc});
+  });
+
+  /* ssd */
+  part('ssd',V(-.2,.3,1.1));
+  B(.9,.26,.025,0x1b2b25,-.1,.68,-.64);
+  B(.22,.2,.012,0x15171a,-.4,.68,-.623);
+  B(.22,.2,.012,0x15171a,-.15,.68,-.623);
+  B(.16,.16,.012,0x0d0e10,.1,.68,-.623);
+  B(.7,.05,.004,0xd9822b,-.1,.76,-.628);
+
+  /* battery */
+  part('bat',V(.2,-.2,1.0));
+  C(.13,.13,.04,0xc9d0d3,.45,-.35,-.625,'z',{m:.9,r:.3});
+  C(.1,.1,.045,0x9aa3a7,.45,-.35,-.623,'z',{m:.9,r:.3});
+
+  /* psu */
+  part('psu',V(0,-.9,.4));
+  B(3.0,.9,1.5,0x1d2326,-.5,-1.92,-.2,{edge:1,m:.3});
+  B(.9,.35,.01,0xd9822b,-1.3,-1.92,.555);
+  for(let i=0;i<6;i++)B(.22,.14,.03,0x3d474c,.1+i*.28,-1.92,.56);
+
+  /* gpu */
+  part('gpu',V(0,-.3,2.0));
+  B(2.5,.4,.95,0x1f2428,-.1,.3,-.125,{edge:1,m:.4});
+  B(.04,.64,.8,0x8b9296,-1.36,.3,-.125,{m:.8});
+  B(1.9,.06,.02,0x111111,-.1,.3,.36,{led:0x4fcfdc});
+  B(.3,.16,.1,0x15171a,.95,.3,.38);
+  [-1.0,-.1,.8].forEach(x=>fan(.29,0x2c3236,x,.085,-.125,'-y',0x4fcfdc));
+
+  /* hdd */
+  part('hdd',V(.8,-.6,.5));
+  B(.45,1.3,.9,0x6e777c,1.7,-1.74,-.2,{edge:1,m:.7,r:.4});
+  B(.46,.7,.5,0xc9d0d3,1.7,-1.74,-.2,{m:.2});
+  B(.2,.12,.06,0x15171a,1.7,-1.07,.1);
+
+  /* case fans */
+  part('fanF',V(.9,0,.3));  fan(.52,0x2c3236,1.97,.9,-.3,'x',0xff9f4a);
+  part('fanR',V(-.9,0,.3)); fan(.52,0x2c3236,-1.97,1.7,-.3,'x',0xff9f4a);
+
+  /* cables */
+  part('c24',V(.9,-.2,1.9));
+  tube([[.8,-1.47,.15],[1.1,-1.15,.2],[1.45,-.55,.1],[1.33,.1,-.4],[1.3,.45,-.52]],0x2c3a3f);
+  B(.16,.74,.22,0x15191b,1.3,.45,-.54);
+  part('c8',V(-.5,.3,1.8));
+  tube([[-1.75,-1.47,-.1],[-1.8,-.5,-.2],[-1.78,1.0,-.4],[-1.7,1.9,-.5],[-1.45,2.05,-.55],[-1.3,2.05,-.56]],0x4a3d22);
+  B(.32,.14,.14,0x15191b,-1.3,2.05,-.56);
+  part('cgpu',V(.3,-.4,2.6));
+  tube([[.5,-1.47,.35],[.8,-.9,.6],[.98,-.2,.6],[.95,.2,.46]],0x3a4430);
+  B(.34,.18,.14,0x15191b,.95,.3,.43);
+  part('csata',V(.8,-.3,1.2));
+  tube([[1.7,-1.07,.1],[1.78,-.7,.25],[1.55,-.55,.1],[1.25,-.6,-.45]],0xb33a3a,.04);
+  B(.22,.12,.07,0x15191b,1.2,-.62,-.5);
+  B(.22,.12,.07,0x15191b,1.7,-1.07,.14);
+
+  return {parts,leds,fans,edges};
+}
+
+/* ===== 3D CORE: scene, orbit camera, picking, highlights ===== */
+const Scene3D=(function(){
+  const S={ready:false,failed:false,onPick:null,onHover:null,tick:null,noHover:false};
+  let renderer,scene,camera,box,M,wrap,running=false,last=0;
+  let explode=0,xray=false,power=false,auto=false,dark=false,pwr=0,fanSpeed=0;
+  let selected=null,hovered=null,hints=[],hintSet=new Set();
+  const cam={az:.55,el:.22,dist:9.5,tx:0,ty:.1,tz:0};
+  const tg={az:.55,el:.22,dist:9.5,tx:0,ty:.1,tz:0};
+  let ray,mv;
+  const ease=t=>1-Math.pow(1-t,3);
+  const homeDist=()=>Math.max(8.2,5.9/Math.max(.3,camera.aspect));
+
+  S.init=function(el){
+    try{
+      if(typeof THREE==='undefined')throw 0;
+      wrap=el;
+      ray=new THREE.Raycaster();mv=new THREE.Vector2();HOV=new THREE.Color(0xffffff);SEL=new THREE.Color(0xf0893a);HNT=new THREE.Color(0x2cc5d6);
+      renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+      renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+      el.appendChild(renderer.domElement);
+      scene=new THREE.Scene();
+      camera=new THREE.PerspectiveCamera(40,1,.1,100);
+      scene.add(new THREE.HemisphereLight(0xffffff,0x4a5a55,.95));
+      const d1=new THREE.DirectionalLight(0xffffff,.9);d1.position.set(4,6,8);scene.add(d1);
+      const d2=new THREE.DirectionalLight(0x9fd8ff,.35);d2.position.set(-6,2,-4);scene.add(d2);
+      M=buildPC();
+      for(const id in M.parts)scene.add(M.parts[id].g);
+      bind(el);
+      new ResizeObserver(resize).observe(el);
+      resize();S.ready=true;S.resetView(false);
+      loop(performance.now());return true;
+    }catch(e){S.failed=true;return false}
+  };
+  function resize(){
+    if(!renderer)return;const w=wrap.clientWidth,h=wrap.clientHeight;if(!w||!h)return;
+    renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+  }
+  function bind(el){
+    const ptrs=new Map();let moved=0,t0=0,pinch=0;
+    const cv=renderer.domElement;
+    cv.addEventListener('contextmenu',e=>e.preventDefault());
+    cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});moved=0;t0=performance.now();if(ptrs.size===2){const a=[...ptrs.values()];pinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}});
+    cv.addEventListener('pointermove',e=>{
+      const p=ptrs.get(e.pointerId);
+      if(!p){if(e.pointerType==='mouse')hoverAt(e);return}
+      const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;moved+=Math.abs(dx)+Math.abs(dy);
+      if(ptrs.size===2){const a=[...ptrs.values()],d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(pinch)tg.dist=Math.min(22,Math.max(3.5,tg.dist*pinch/d));pinch=d}
+      else if(e.buttons===2||e.shiftKey){const k=tg.dist*.0014;const r=new THREE.Vector3().setFromMatrixColumn(camera.matrix,0),u=new THREE.Vector3().setFromMatrixColumn(camera.matrix,1);
+        tg.tx-=r.x*dx*k-u.x*dy*k;tg.ty-=r.y*dx*k-u.y*dy*k;tg.tz-=r.z*dx*k-u.z*dy*k}
+      else{tg.az-=dx*.008;tg.el=Math.min(1.35,Math.max(-.4,tg.el+dy*.006))}
+    });
+    const up=e=>{
+      const had=ptrs.delete(e.pointerId);pinch=0;
+      if(had&&moved<6&&performance.now()-t0<600&&e.type==='pointerup'){const id=pickAt(e);if(S.onPick)S.onPick(id)}
+    };
+    cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+    cv.addEventListener('wheel',e=>{e.preventDefault();tg.dist=Math.min(22,Math.max(3.5,tg.dist*Math.exp(e.deltaY*.0012)))},{passive:false});
+    cv.addEventListener('dblclick',()=>S.resetView(true));
+    el.addEventListener('keydown',e=>{const k=e.key;
+      if(k==='ArrowLeft')tg.az+=.15;else if(k==='ArrowRight')tg.az-=.15;else if(k==='ArrowUp')tg.el=Math.min(1.35,tg.el+.1);else if(k==='ArrowDown')tg.el=Math.max(-.4,tg.el-.1);
+      else if(k==='+'||k==='=')tg.dist=Math.max(3.5,tg.dist*.88);else if(k==='-')tg.dist=Math.min(22,tg.dist/.88);else return;e.preventDefault()});
+  }
+  function pickables(){
+    const out=[];
+    for(const id in M.parts){const p=M.parts[id];if(!p.vis||p.alpha<.99)continue;
+      p.g.traverse(o=>{if((o.isMesh||o.isInstancedMesh)&&!o.userData.skipPick&&!o.parent.userData.skipPick&&!o.userData.fanPart)out.push(o)})}
+    return out;
+  }
+  function pickAt(e){
+    const r=renderer.domElement.getBoundingClientRect();
+    mv.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);
+    ray.setFromCamera(mv,camera);const hit=ray.intersectObjects(pickables(),false)[0];
+    if(!hit)return null;let o=hit.object;while(o&&!o.userData.pid)o=o.parent;return o?o.userData.pid:null;
+  }
+  let hoverBusy=false;
+  function hoverAt(e){
+    if(S.noHover||hoverBusy)return;hoverBusy=true;
+    requestAnimationFrame(()=>{hoverBusy=false;const id=pickAt(e);if(id!==hovered){hovered=id;renderer.domElement.style.cursor=id?'pointer':'';if(S.onHover)S.onHover(id)}});
+  }
+  S.setSelected=id=>{selected=id};
+  S.setHints=ids=>{hints=ids||[];hintSet=new Set(hints)};
+  S.setExplode=v=>{explode=v};
+  S.setXray=v=>{xray=v};
+  S.setPower=v=>{power=v};
+  S.setAuto=v=>{auto=v};
+  S.setTheme=d=>{dark=d;if(M)M.edges.forEach(l=>l.material.color.setHex(d?0x7fa396:0x44564f))};
+  S.run=v=>{running=v;if(v){last=performance.now();resize()}};
+  S.resetView=anim=>{if(!camera)return;tg.az=.55;tg.el=.22;tg.dist=homeDist();tg.tx=0;tg.ty=.1;tg.tz=0;if(!anim)Object.assign(cam,tg)};
+  S.partIds=()=>M?Object.keys(M.parts):[];
+  S.isVisible=id=>!!M&&M.parts[id].vis;
+  S.showAll=()=>{if(!M)return;for(const id in M.parts){const p=M.parts[id];p.vis=true;p.g.visible=true;p.alpha=1;p.off.set(0,0,0);p.tw=null;p.ghost=false}};
+  S.hide=id=>{if(!M)return;const p=M.parts[id];p.vis=false;p.g.visible=false;p.tw=null;p.ghost=false};
+  S.ghost=id=>{if(!M)return;const p=M.parts[id];p.vis=true;p.g.visible=true;p.alpha=.28;p.ghost=true;p.off.set(0,0,0);p.tw=null};
+  S.install=(id,anim)=>{if(!M)return;const p=M.parts[id];p.vis=true;p.g.visible=true;p.ghost=false;
+    if(!anim){p.alpha=1;p.off.set(0,0,0);p.tw=null;return}
+    const from=p.dir.clone().multiplyScalar(1.3);p.off.copy(from);
+    p.tw={t0:performance.now(),dur:850,from,a0:p.alpha<1?p.alpha:0,};p.alpha=p.tw.a0};
+  S.frame=(ids,dist)=>{
+    if(!M)return;const b=new THREE.Box3();let any=false;
+    (ids||[]).forEach(id=>{const p=M.parts[id];if(p&&p.vis){p.g.updateMatrixWorld(true);b.union(new THREE.Box3().setFromObject(p.g));any=true}});
+    if(!any){S.resetView(true);return}
+    const c=b.getCenter(new THREE.Vector3());tg.tx=c.x;tg.ty=c.y;tg.tz=c.z;
+    tg.dist=Math.max(dist||5,(dist||5)*Math.max(1,1.1/Math.max(.4,camera.aspect)));
+  };
+  S.project=id=>{
+    if(!M)return null;const p=M.parts[id];if(!p)return null;p.g.updateMatrixWorld(true);
+    const b=new THREE.Box3().setFromObject(p.g),c=b.getCenter(new THREE.Vector3());c.y=b.max.y;c.project(camera);
+    if(c.z>1)return null;return{x:(c.x+1)/2*wrap.clientWidth,y:(1-c.y)/2*wrap.clientHeight};
+  };
+  S.name=null;
+
+  let HOV,SEL,HNT;
+  function loop(now){
+    requestAnimationFrame(loop);
+    if(!running||!S.ready)return;
+    const dt=Math.min(.05,(now-last)/1000);last=now;const k=1-Math.exp(-dt*9);
+    if(auto&&!document.hidden)tg.az+=dt*.35;
+    for(const key of ['az','el','dist','tx','ty','tz'])cam[key]+=(tg[key]-cam[key])*k;
+    const cx=Math.cos(cam.el);
+    camera.position.set(cam.tx+cam.dist*cx*Math.sin(cam.az),cam.ty+cam.dist*Math.sin(cam.el),cam.tz+cam.dist*cx*Math.cos(cam.az));
+    camera.lookAt(cam.tx,cam.ty,cam.tz);
+    pwr+=((power?1:0)-pwr)*Math.min(1,dt*4);fanSpeed+=((power?1:0)*10-fanSpeed)*Math.min(1,dt*1.6);
+    M.leds.forEach(m=>{m.emissiveIntensity=pwr*.95});
+    M.fans.forEach(f=>{f.blades.rotation.z-=fanSpeed*dt});
+    const pulse=.5+.5*Math.sin(now/260);
+    for(const id in M.parts){const p=M.parts[id];
+      if(p.tw){const t=Math.min(1,(now-p.tw.t0)/p.tw.dur),e=ease(t);p.off.copy(p.tw.from).multiplyScalar(1-e);p.alpha=p.tw.a0+(1-p.tw.a0)*e;if(t>=1)p.tw=null}
+      p.g.position.set(p.off.x+p.dir.x*explode,p.off.y+p.dir.y*explode,p.off.z+p.dir.z*explode);
+      let col=null,amt=0;
+      if(id===selected){col=SEL;amt=.55}else if(hintSet.has(id)){col=HNT;amt=.25+.35*pulse}else if(id===hovered){col=HOV;amt=.22}
+      p.h+=((col?amt:0)-p.h)*.2;
+      const focus=id===selected||hintSet.has(id)||id===hovered;
+      p.xr+=((xray&&!focus?1:0)-p.xr)*.2;
+      const op=(1-.88*p.xr)*p.alpha,tr=op<.995;
+      for(const m of p.mats){
+        if(m.emissive&&!m.userData.led){if(col)m.emissive.copy(col);m.emissiveIntensity=p.h*.75}
+        const fo=m.userData.o*op;m.opacity=fo;
+        const t2=tr||m.userData.o<1;if(m.transparent!==t2){m.transparent=t2;m.needsUpdate=true}
+        m.depthWrite=!tr;
+      }
+    }
+    renderer.render(scene,camera);
+    if(S.tick)S.tick();
+  }
+  return S;
+})();
+
+/* ===== APP ===== */
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const VIEWS=['lab','build','diag','quiz','rank','wiki','prog'];
+const WIDE=new Set(['quiz','rank','wiki','prog']);
+
+/* persistent state (guarded) */
+const DEF={seen:[],built:0,scen:{},quiz:{best:0,runs:0},find:0,me:null};
+let ST=JSON.parse(JSON.stringify(DEF));
+try{const s=localStorage.getItem('pc-trainer-v1');if(s)ST=Object.assign(ST,JSON.parse(s))}catch(e){}
+let syncHook=null;
+const save=()=>{try{localStorage.setItem('pc-trainer-v1',JSON.stringify(ST))}catch(e){}if(syncHook)syncHook()};
+
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600)}
+
+/* achievements */
+const ACH=[
+ ['look','Первый осмотр','Открой любую деталь в лаборатории',()=>ST.seen.length>=1],
+ ['allparts','Знаток комплектующих','Изучи все детали в лаборатории',()=>ST.seen.length>=PARTS.length],
+ ['hunter','Охотник за деталями','Найди 10 деталей в режиме «Найди деталь»',()=>ST.find>=10],
+ ['built','Сборщик','Пройди пошаговую сборку до первого включения',()=>ST.built>=ASSEMBLY.length],
+ ['first','Первый вызов','Закрой первый сценарий диагностики',()=>Object.keys(ST.scen).length>=1],
+ ['clean','Чистая работа','Закрой сценарий без ошибок (3 звезды)',()=>Object.values(ST.scen).some(v=>v.stars===3)],
+ ['all','Мастер диагностики','Закрой все сценарии',()=>Object.keys(ST.scen).length>=SCENARIOS.length],
+ ['q80','Теоретик','Набери 80% в тесте',()=>ST.quiz.best>=80],
+ ['q100','Отличник','Набери 100% в тесте',()=>ST.quiz.best>=100]
+];
+let gotSet=new Set(ACH.filter(a=>a[3]()).map(a=>a[0]));
+function checkAch(){ACH.forEach(a=>{if(!gotSet.has(a[0])&&a[3]()){gotSet.add(a[0]);toast('Достижение: '+a[1])}});}
+
+/* ---------- navigation ---------- */
+let view=null;
+function go(v,silent){
+  if(!VIEWS.includes(v))v='lab';
+  if(view===v)return;
+  const prev=view;view=v;
+  if(!silent&&location.hash!=='#'+v)try{history.replaceState(null,'','#'+v)}catch(e){}
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===v));
+  document.querySelectorAll('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));
+  document.body.toggleAttribute('data-wide',WIDE.has(v));
+  Scene3D.run(!WIDE.has(v));
+  Scene3D.setSelected(null);Scene3D.setHints([]);Scene3D.setPower(false);tipId=null;$('#tip').hidden=true;
+  $('#tgPower').setAttribute('aria-pressed','false');
+  if(v==='lab')labInit();else if(v==='build')buildInit();else if(v==='diag')diagInit();else if(v==='quiz')quizInit();else if(v==='rank')rankInit();else if(v==='wiki')wikiInit();else if(v==='prog')progInit();
+  const hs=$('#hint');hs.hidden=false;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>go(t.dataset.view)));
+window.addEventListener('hashchange',()=>go(location.hash.slice(1),true));
+
+/* ---------- 3D toolbar ---------- */
+function bindTool(id,fn){const b=$(id);b.addEventListener('click',()=>{if(b.hasAttribute('aria-pressed')){const v=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',v);fn(v)}else fn()})}
+$('#explode').addEventListener('input',e=>Scene3D.setExplode(e.target.value/100*1.15));
+bindTool('#tgXray',v=>Scene3D.setXray(v));
+bindTool('#tgPower',v=>Scene3D.setPower(v));
+bindTool('#tgSpin',v=>Scene3D.setAuto(v));
+bindTool('#tgReset',()=>Scene3D.resetView(true));
+bindTool('#tgBig',v=>{document.body.toggleAttribute('data-big',v);setTimeout(()=>Scene3D.resetView(true),60)});
+
+/* theme */
+function applyTheme(d){document.documentElement.dataset.theme=d?'dark':'light';Scene3D.setTheme(d)}
+let isDark=matchMedia('(prefers-color-scheme: dark)').matches;
+try{const t=localStorage.getItem('pc-theme');if(t)isDark=t==='dark'}catch(e){}
+$('#themeBtn').addEventListener('click',()=>{isDark=!isDark;applyTheme(isDark);try{localStorage.setItem('pc-theme',isDark?'dark':'light')}catch(e){}});
+
+/* tooltip over hovered part */
+let tipId=null;
+Scene3D.onHover=id=>{tipId=id;const t=$('#tip');if(!id){t.hidden=true;return}t.textContent=PARTMAP[id].n;t.hidden=false;placeTip()};
+function placeTip(){if(!tipId)return;const p=Scene3D.project(tipId),t=$('#tip');if(!p){t.hidden=true;return}t.style.left=Math.min(Math.max(p.x,60),$('#stage').clientWidth-60)+'px';t.style.top=Math.max(p.y,30)+'px'}
+Scene3D.tick=()=>{if(tipId)placeTip()};
+
+/* ---------- LAB ---------- */
+let labSel=null,findMode=false,findTarget=null,findScore=0,findTries=0;
+function labInit(){
+  Scene3D.showAll();Scene3D.resetView(true);labSel=null;findMode=false;
+  Scene3D.onPick=id=>{if(findMode)return findPick(id);if(id)selectPart(id);else{labSel=null;Scene3D.setSelected(null);renderLab()}};
+  renderLab();
+}
+function selectPart(id){
+  labSel=id;Scene3D.setSelected(id);Scene3D.frame([id],5.2);
+  if(!ST.seen.includes(id)){ST.seen.push(id);save();checkAch()}
+  renderLab();
+}
+function renderLab(){
+  const el=$('#v-lab'),groups={};PARTS.forEach(p=>(groups[p.g]=groups[p.g]||[]).push(p));
+  let h=`<div class="head"><span class="eyebrow">Лаборатория</span><h1>Разбери компьютер по деталям</h1><p class="lead">Вращай модель и нажимай на детали. Ползунок «Разнести» раздвигает компоненты, «Рентген» делает остальные прозрачными, «Питание» запускает вентиляторы и подсветку.</p></div>`;
+  h+=`<div class="card" id="partCard">`;
+  if(findMode){
+    h+=`<div class="row sp"><span class="eyebrow">Режим «Найди деталь»</span><span class="score">${findScore} верно</span></div><h2 style="margin:8px 0">Нажми на модели: ${esc(PARTMAP[findTarget].n)}</h2><p class="muted">Попыток на деталь: ${findTries} из 2. После второй ошибки деталь подсветится сама.</p><div class="row" style="margin-top:12px"><button class="btn" id="findStop">Закончить</button></div>`;
+  }else if(labSel){
+    const p=PARTMAP[labSel];
+    h+=`<div class="row sp"><h2>${esc(p.n)}</h2><span class="pill acc">${esc(p.g)}</span></div>
+    <div class="kv"><div><h4>Что делает</h4><p>${esc(p.role)}</p></div><div><h4>Как ломается</h4><p>${esc(p.fail)}</p></div><div><h4>Как проверить</h4><p>${esc(p.check)}</p></div></div>
+    <div class="note" style="margin-top:12px"><b>Совет мастера.</b> ${esc(p.tip)}</div>`;
+  }else{
+    h+=`<h2>Выбери деталь</h2><p class="muted" style="margin-top:6px">Нажми на деталь на 3D-модели или в списке ниже. Изучено: <b>${ST.seen.length}</b> из ${PARTS.length}.</p><div class="bar" style="margin-top:10px"><i style="width:${ST.seen.length/PARTS.length*100}%"></i></div><div class="row" style="margin-top:12px"><button class="btn pri" id="findStart">Найди деталь</button></div>`;
+  }
+  h+=`</div>`;
+  Object.keys(groups).forEach(g=>{h+=`<div class="grp">${esc(g)}</div><div class="partgrid">`+groups[g].map(p=>`<button class="pc${labSel===p.id?' on':''}${ST.seen.includes(p.id)?' seen':''}" data-p="${p.id}"><i></i>${esc(p.n)}</button>`).join('')+`</div>`});
+  el.innerHTML=h;
+  el.querySelectorAll('.pc').forEach(b=>b.addEventListener('click',()=>{if(findMode)return;selectPart(b.dataset.p)}));
+  const fs=$('#findStart');if(fs)fs.addEventListener('click',findStart);
+  const fe=$('#findStop');if(fe)fe.addEventListener('click',()=>{findMode=false;Scene3D.setHints([]);if(findScore){ST.find+=findScore;save();checkAch()}findScore=0;renderLab()});
+}
+function findStart(){findMode=true;findScore=0;nextFind();Scene3D.setSelected(null);Scene3D.resetView(true)}
+function nextFind(){findTries=0;const pool=PARTS.map(p=>p.id).filter(i=>i!==findTarget);findTarget=pool[Math.floor(Math.random()*pool.length)];Scene3D.setHints([]);renderLab()}
+function findPick(id){
+  if(!id)return;
+  if(id===findTarget){findScore++;toast('Верно: '+PARTMAP[id].n);nextFind()}
+  else{findTries++;toast('Это «'+PARTMAP[id].n+'». Ищи дальше');if(findTries>=2){Scene3D.setHints([findTarget])}renderLab()}
+}
+
+/* ---------- BUILD ---------- */
+let bCur=0;
+function buildInit(){
+  Scene3D.onPick=id=>{if(id)toast(PARTMAP[id].n+': '+PARTMAP[id].role.split('.')[0])};
+  bCur=Math.min(ST.built>=ASSEMBLY.length?0:ST.built,ASSEMBLY.length-1);
+  bApply(false);renderBuild();
+}
+function bApply(anim){
+  Scene3D.showAll();Scene3D.setPower(false);$('#tgPower').setAttribute('aria-pressed','false');
+  const inst=new Set();
+  ASSEMBLY.forEach((s,i)=>{if(i<bCur){if(s.part)inst.add(s.part);(s.also||[]).forEach(a=>inst.add(a))}});
+  Scene3D.partIds().forEach(id=>{if(!inst.has(id))Scene3D.hide(id)});
+  const s=ASSEMBLY[bCur];
+  if(s&&s.part){Scene3D.ghost(s.part);(s.also||[]).forEach(a=>Scene3D.ghost(a));Scene3D.setHints([s.part,...(s.also||[])]);Scene3D.frame([s.part],6)}
+  else{Scene3D.setHints([]);Scene3D.resetView(true)}
+}
+function renderBuild(){
+  const el=$('#v-build'),s=ASSEMBLY[bCur],done=bCur>=ASSEMBLY.length;
+  let h=`<div class="head"><span class="eyebrow">Сборка</span><h1>Собери ПК шаг за шагом</h1><p class="lead">Полупрозрачная деталь на модели показывает, куда она встанет. Прочитай шаг и нажми «Установить»: деталь займёт своё место.</p></div>`;
+  h+=`<div class="card"><div class="row sp"><span class="eyebrow">Шаг ${Math.min(bCur+1,ASSEMBLY.length)} из ${ASSEMBLY.length}</span><span class="score">${Math.round(bCur/ASSEMBLY.length*100)}%</span></div><div class="bar" style="margin:8px 0 12px"><i style="width:${bCur/ASSEMBLY.length*100}%"></i></div>`;
+  if(s){
+    h+=`<h2>${esc(s.title)}</h2><p style="margin-top:8px">${esc(s.text)}</p><div class="note warn" style="margin-top:10px"><b>Внимание.</b> ${esc(s.warn)}</div>`;
+    if(s.tools.length)h+=`<div class="grp">Понадобится</div><div class="partgrid">`+s.tools.map(t=>`<span class="pill">${esc(t)}</span>`).join('')+`</div>`;
+    h+=`<div class="row" style="margin-top:14px"><button class="btn" id="bPrev"${bCur===0?' disabled':''}>Назад</button><button class="btn pri" id="bNext">${s.part?'Установить':'Включить ПК'}</button></div>`;
+  }else{
+    h+=`<h2>Сборка завершена</h2><p style="margin-top:8px">Компьютер собран и запущен: вентиляторы вращаются, подсветка горит. Теперь переходи в «Диагностику» и ищи неисправности.</p><div class="row" style="margin-top:14px"><button class="btn" id="bAgain">Собрать заново</button><button class="btn pri" id="bDiag">В диагностику</button></div>`;
+  }
+  h+=`</div><div class="grp">Все шаги</div><div class="steps">`+ASSEMBLY.map((a,i)=>`<button class="st${i<bCur?' done':''}${i===bCur&&!done?' cur':''}" data-i="${i}"><b>${i<bCur?'✓':i+1}</b>${esc(a.title)}</button>`).join('')+`</div>`;
+  el.innerHTML=h;
+  const bn=$('#bNext');if(bn)bn.addEventListener('click',bNext);
+  const bp=$('#bPrev');if(bp)bp.addEventListener('click',()=>{bCur--;bApply();renderBuild()});
+  const ba=$('#bAgain');if(ba)ba.addEventListener('click',()=>{bCur=0;bApply();renderBuild()});
+  const bd=$('#bDiag');if(bd)bd.addEventListener('click',()=>go('diag'));
+  el.querySelectorAll('.st').forEach(b=>b.addEventListener('click',()=>{bCur=+b.dataset.i;bApply();renderBuild()}));
+  const cur=el.querySelector('.st.cur');if(cur)cur.scrollIntoView({block:'nearest'});
+}
+function bNext(){
+  const s=ASSEMBLY[bCur];
+  if(s.part){Scene3D.setHints([]);Scene3D.install(s.part,true);(s.also||[]).forEach(a=>Scene3D.install(a,true))}
+  bCur++;
+  if(bCur>ASSEMBLY.length-1&&!ASSEMBLY[bCur-1].part){}
+  if(bCur===ASSEMBLY.length-1){/* final step: power on */}
+  if(bCur>=ASSEMBLY.length){Scene3D.setPower(true);$('#tgPower').setAttribute('aria-pressed','true');Scene3D.resetView(true);if(ST.built<ASSEMBLY.length){ST.built=ASSEMBLY.length;save();checkAch()}renderBuild();return}
+  const n=ASSEMBLY[bCur];
+  if(n.part){Scene3D.ghost(n.part);(n.also||[]).forEach(a=>Scene3D.ghost(a));Scene3D.setHints([n.part,...(n.also||[])]);Scene3D.frame([n.part],6)}else Scene3D.resetView(true);
+  if(bCur>ST.built&&bCur<ASSEMBLY.length){ST.built=bCur;save()}
+  renderBuild();
+}
+
+/* ---------- DIAGNOSTICS ---------- */
+let D=null;
+function diagInit(){
+  Scene3D.showAll();Scene3D.resetView(true);D=null;
+  Scene3D.onPick=id=>{if(id)toast(PARTMAP[id].n)};
+  renderDiagList();
+}
+function lvl(n){return `<span class="lvl" title="Сложность ${n} из 3">${[1,2,3].map(i=>`<i class="${i<=n?'f':''}"></i>`).join('')}</span>`}
+function renderDiagList(){
+  const el=$('#v-diag');
+  let h=`<div class="head"><span class="eyebrow">Диагностика</span><h1>Реши заявку клиента</h1><p class="lead">К тебе принесли неисправный ПК. Выбирай действия по очереди: ошибочный шаг стоит звезды, а разбор покажет, почему так делать не стоит. Закрыто сценариев: <b>${Object.keys(ST.scen).length}</b> из ${SCENARIOS.length}.</p></div><div class="stack">`;
+  SCENARIOS.forEach(s=>{const r=ST.scen[s.id];
+    h+=`<button class="scen" data-s="${s.id}"><div class="row sp"><h3>${esc(s.n)}</h3>${r?`<span class="stars" aria-label="${r.stars} из 3">${'★'.repeat(r.stars)}${'☆'.repeat(3-r.stars)}</span>`:`<span class="pill">Новый</span>`}</div><p class="muted">${esc(s.sym)}</p><div class="row"><span class="pill">Сложность ${lvl(s.lvl)}</span><span class="pill">~${s.min} мин</span></div></button>`});
+  h+=`</div>`;
+  el.innerHTML=h;
+  el.querySelectorAll('.scen').forEach(b=>b.addEventListener('click',()=>startScen(b.dataset.s)));
+}
+function startScen(id){
+  const s=SCENARIOS.find(x=>x.id===id);
+  D={s,node:s.start,mist:0,log:[],picked:null,fb:null};
+  renderScen();
+}
+function renderScen(){
+  const el=$('#v-diag'),{s}=D,n=s.nodes[D.node];
+  Scene3D.showAll();
+  let h=`<div class="row" style="margin-bottom:12px"><button class="btn sm" id="dBack">← К списку</button><span class="pill">Ошибок: ${D.mist}</span></div>`;
+  h+=`<div class="ticket"><span class="mono">Заявка</span><p>${esc(s.ticket)}</p><span class="pill cool" style="justify-self:start">${esc(s.sym)}</span></div>`;
+  if(n.end){
+    const stars=Math.max(1,3-D.mist);Scene3D.setHints([]);Scene3D.resetView(true);
+    const prev=ST.scen[s.id];if(!prev||prev.stars<stars){ST.scen[s.id]={stars};save()}checkAch();
+    h+=`<div class="card" style="margin-top:12px"><span class="eyebrow">Заявка закрыта</span><h2 style="margin:6px 0">${esc(n.t)}</h2><div class="stars" style="font-size:22px">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div><div class="note" style="margin-top:12px"><b>Урок.</b> ${esc(n.lesson)}</div><div class="row" style="margin-top:14px"><button class="btn" id="dRetry">Пройти заново</button><button class="btn pri" id="dList">К списку</button></div></div>`;
+  }else{
+    Scene3D.setHints(n.hl||[]);if(n.hl&&n.hl.length)Scene3D.frame(n.hl,7);
+    h+=`<div class="card" style="margin-top:12px"><h2 style="margin-bottom:12px">${esc(n.t)}</h2><div class="stack">`;
+    if(!D.order||D.orderNode!==D.node){D.order=shuffle(n.o.map((o,i)=>i));D.orderNode=D.node}
+    D.order.forEach(i=>{const o=n.o[i],pk=D.picked===i,st=D.picked==null?'':pk?(o[3]?'ok':'bad'):'dim';
+      h+=`<button class="opt ${st}" data-i="${i}"${D.fb&&o[3]?'':''}${D.fb&&D.fb.good?' disabled':''}>${esc(o[0])}</button>`});
+    h+=`</div>`;
+    if(D.fb)h+=`<div class="note${D.fb.good?'':' warn'}" style="margin-top:12px"><b>${D.fb.good?'Верно.':'Не лучший шаг.'}</b> ${esc(D.fb.text)}</div>${D.fb.good?`<div class="row" style="margin-top:12px"><button class="btn pri" id="dNext">Дальше</button></div>`:''}`;
+    h+=`</div>`;
+  }
+  if(D.log.length)h+=`<div class="grp">Журнал работ</div><div class="log">`+D.log.map(l=>`<div class="${l.g?'g':'b'}">${esc(l.t)}</div>`).join('')+`</div>`;
+  el.innerHTML=h;
+  $('#dBack').addEventListener('click',()=>{D=null;Scene3D.setHints([]);renderDiagList()});
+  const dn=$('#dNext');if(dn)dn.addEventListener('click',()=>{D.node=D.fb.next;D.picked=null;D.fb=null;renderScen();window.scrollTo({top:0,behavior:'smooth'})});
+  const dr=$('#dRetry');if(dr)dr.addEventListener('click',()=>startScen(s.id));
+  const dl=$('#dList');if(dl)dl.addEventListener('click',()=>{D=null;renderDiagList()});
+  el.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>pickOpt(+b.dataset.i)));
+}
+function pickOpt(i){
+  const n=D.s.nodes[D.node],o=n.o[i];
+  if(D.picked!==null&&n.o[D.picked][3])return;
+  D.picked=i;D.fb={good:!!o[3],text:o[1],next:o[2]};
+  D.log.push({g:!!o[3],t:o[0]});if(!o[3]){D.mist++}
+  renderScen();
+  const f=$('#v-diag .note');if(f)f.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+
+/* ---------- QUIZ ---------- */
+let Q=null;
+function quizInit(){
+  Q=null;
+  const b=ST.quiz.best;
+  $('#v-quiz').innerHTML=`<div class="head"><span class="eyebrow">Тест</span><h1>Проверь теорию</h1><p class="lead">Десять случайных вопросов из ${QUIZ.length}. После каждого ответа появляется объяснение. Лучший результат: <b>${b}%</b>, попыток: ${ST.quiz.runs}.</p></div><div class="card"><div class="row"><button class="btn pri" id="qStart">Начать тест</button></div></div>`;
+  $('#qStart').addEventListener('click',()=>{Q={list:shuffle(QUIZ).slice(0,10).map(q=>{const idx=shuffle([0,1,2,3]);return{q:q[0],o:idx.map(i=>q[1][i]),c:idx.indexOf(q[2]),e:q[3]}}),i:0,score:0,ans:null};renderQuiz()});
+}
+function renderQuiz(){
+  const el=$('#v-quiz');
+  if(Q.i>=Q.list.length){
+    const pct=Math.round(Q.score/Q.list.length*100);ST.quiz.runs++;if(pct>ST.quiz.best)ST.quiz.best=pct;save();checkAch();
+    const msg=pct>=80?'Отличный результат':pct>=50?'Неплохо, но есть что повторить':'Загляни в «Лабораторию» и «Словарь», потом попробуй снова';
+    el.innerHTML=`<div class="head"><span class="eyebrow">Результат</span><h1>${Q.score} из ${Q.list.length}</h1><p class="lead">${msg}.</p></div><div class="card"><div class="bar"><i style="width:${pct}%"></i></div><div class="row" style="margin-top:14px"><button class="btn pri" id="qAgain">Ещё раз</button><button class="btn" id="qLab">В лабораторию</button></div></div>`;
+    $('#qAgain').addEventListener('click',()=>{Q=null;quizInit();$('#qStart').click()});
+    $('#qLab').addEventListener('click',()=>go('lab'));return;
+  }
+  const q=Q.list[Q.i];
+  let h=`<div class="row sp" style="margin-bottom:10px"><span class="eyebrow">Вопрос ${Q.i+1} из ${Q.list.length}</span><span class="score">${Q.score} верно</span></div><div class="bar" style="margin-bottom:14px"><i style="width:${Q.i/Q.list.length*100}%"></i></div><div class="card"><h2 style="margin-bottom:14px">${esc(q.q)}</h2><div class="stack">`;
+  q.o.forEach((t,i)=>{let c='';if(Q.ans!==null){c=i===q.c?'ok':i===Q.ans?'bad':'dim'}h+=`<button class="opt ${c}" data-i="${i}"${Q.ans!==null?' disabled':''}>${esc(t)}</button>`});
+  h+=`</div>`;
+  if(Q.ans!==null)h+=`<div class="note${Q.ans===q.c?'':' warn'}" style="margin-top:12px"><b>${Q.ans===q.c?'Верно.':'Неверно.'}</b> ${esc(q.e)}</div><div class="row" style="margin-top:12px"><button class="btn pri" id="qNext">${Q.i===Q.list.length-1?'Результат':'Дальше'}</button></div>`;
+  h+=`</div>`;el.innerHTML=h;
+  el.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{if(Q.ans!==null)return;Q.ans=+b.dataset.i;if(Q.ans===q.c)Q.score++;renderQuiz()}));
+  const qn=$('#qNext');if(qn)qn.addEventListener('click',()=>{Q.i++;Q.ans=null;renderQuiz();window.scrollTo({top:0,behavior:'smooth'})});
+}
+
+/* ---------- WIKI ---------- */
+function wikiInit(){
+  $('#v-wiki').innerHTML=`<div class="head"><span class="eyebrow">Словарь</span><h1>Термины и детали</h1><p class="lead">Поиск идёт по названиям деталей, описаниям и терминам.</p></div><input class="search" id="wq" type="search" placeholder="Например: БП, SMART, термопаста" aria-label="Поиск по словарю"><div class="wiki" id="wlist"></div>`;
+  $('#wq').addEventListener('input',renderWiki);renderWiki();
+}
+function renderWiki(){
+  const q=$('#wq').value.trim().toLowerCase(),L=$('#wlist');
+  const parts=PARTS.filter(p=>!q||(p.n+p.role+p.g).toLowerCase().includes(q));
+  const terms=GLOSSARY.filter(t=>!q||(t.t+t.d+t.c).toLowerCase().includes(q));
+  let h=parts.map(p=>`<div class="card"><div class="row sp"><h3>${esc(p.n)}</h3><span class="pill acc">Деталь</span></div><p class="muted">${esc(p.role)}</p><div class="row"><button class="btn sm" data-show="${p.id}">Показать в 3D</button></div></div>`).join('');
+  h+=terms.map(t=>`<div class="card"><div class="row sp"><h3 class="mono" style="font-size:14px">${esc(t.t)}</h3><span class="pill cool">${esc(t.c)}</span></div><p class="muted">${esc(t.d)}</p></div>`).join('');
+  L.innerHTML=h||`<div class="card"><p class="muted">Ничего не найдено. Попробуй другое слово.</p></div>`;
+  L.querySelectorAll('[data-show]').forEach(b=>b.addEventListener('click',()=>{go('lab');selectPart(b.dataset.show)}));
+}
+
+/* ---------- PROGRESS ---------- */
+function progInit(){
+  const total=PARTS.length+ASSEMBLY.length+SCENARIOS.length+1;
+  const done=ST.seen.length+Math.min(ST.built,ASSEMBLY.length)+Object.keys(ST.scen).length+(ST.quiz.best>=80?1:0);
+  const pct=Math.round(done/total*100),r=52,C=2*Math.PI*r;
+  const stars=Object.values(ST.scen).reduce((a,v)=>a+v.stars,0);
+  let h=`<div class="head"><span class="eyebrow">Прогресс</span><h1>Твой путь мастера</h1></div>
+  <div class="card row" style="gap:20px"><svg class="ring" viewBox="0 0 120 120" role="img" aria-label="Общий прогресс ${pct}%"><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--surface2)" stroke-width="10"/><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct/100)}" transform="rotate(-90 60 60)"/><text x="60" y="68" text-anchor="middle">${pct}%</text></svg><div style="flex:1;min-width:200px"><h2>Курс пройден на ${pct}%</h2><p class="muted" style="margin-top:6px">Изучай детали, собирай ПК, решай заявки и сдавай тест.</p></div></div>
+  <div class="stats" style="margin-top:12px"><div class="card"><span class="muted">Деталей изучено</span><b>${ST.seen.length}/${PARTS.length}</b></div><div class="card"><span class="muted">Шагов сборки</span><b>${Math.min(ST.built,ASSEMBLY.length)}/${ASSEMBLY.length}</b></div><div class="card"><span class="muted">Сценариев</span><b>${Object.keys(ST.scen).length}/${SCENARIOS.length}</b></div><div class="card"><span class="muted">Звёзд</span><b>${stars}/${SCENARIOS.length*3}</b></div><div class="card"><span class="muted">Лучший тест</span><b>${ST.quiz.best}%</b></div><div class="card"><span class="muted">Очки рейтинга</span><b>${scoreOf(ST)}</b></div></div>
+  <div class="grp">Достижения</div><div class="ach">`+ACH.map(a=>{const g=a[3]();return `<div class="a${g?' got':''}"><b>${esc(a[1])}</b><p class="muted" style="font-size:13px">${esc(a[2])}</p>${g?'<span class="pill ok" style="margin-top:6px">Получено</span>':''}</div>`}).join('')+`</div>
+  <div class="row" style="margin-top:18px"><button class="btn" id="rst">Сбросить прогресс</button></div>`;
+  $('#v-prog').innerHTML=h;
+  let armed=false;const rb=$('#rst');
+  rb.addEventListener('click',()=>{if(!armed){armed=true;rb.textContent='Нажми ещё раз, чтобы удалить прогресс';return}
+    const keep=ST.me;ST=JSON.parse(JSON.stringify(DEF));ST.me=keep;save();gotSet=new Set();progInit()});
+}
+
+
+/* ===== ACCOUNT, AVATARS, LEADERBOARD ===== */
+const AVATARS=[
+ ['Процессор','<rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/>'],
+ ['Память','<rect x="3" y="8" width="18" height="8" rx="1"/><path d="M6 16v2M10 16v2M14 16v2M18 16v2M7 11h2M11 11h2M15 11h2"/>'],
+ ['Вентилятор','<circle cx="12" cy="12" r="2"/><path d="M12 10c0-4 1-6 3-6s2 3-1 5M14 12c4 0 6 1 6 3s-3 2-5-1M12 14c0 4-1 6-3 6s-2-3 1-5M10 12c-4 0-6-1-6-3s3-2 5 1"/>'],
+ ['Видеокарта','<rect x="2" y="7" width="18" height="9" rx="1.5"/><circle cx="8" cy="11.5" r="2.5"/><circle cx="14" cy="11.5" r="2.5"/><path d="M20 9h2M5 16v2M9 16v2"/>'],
+ ['SSD','<rect x="4" y="9" width="16" height="6" rx="1"/><path d="M7 12h3M16 12h1"/>'],
+ ['Молния','<path d="M13 2 5 13h6l-1 9 8-11h-6z"/>'],
+ ['Отвёртка','<path d="M4 20l6-6M9 15l5-5 4-4 2 2-4 4-5 5zM17 3l4 4"/>'],
+ ['Баг','<ellipse cx="12" cy="13" rx="4" ry="5"/><path d="M12 8V5M8 11 4 9M16 11l4-2M8 15l-4 2M16 15l4 2M9 5 8 3M15 5l1-2"/>'],
+ ['Батарейка','<rect x="3" y="8" width="16" height="8" rx="1.5"/><path d="M21 11v2M7 12h4"/>'],
+ ['Штекер','<path d="M9 3v5M15 3v5M7 8h10v3a5 5 0 0 1-10 0zM12 16v5"/>'],
+ ['Монитор','<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/>'],
+ ['Плата','<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h4v4M12 13h4M8 16h2"/>']
+];
+const AVCOL=['#b8520a','#0f7d58','#0c7480','#6a4fc8','#bb3326','#a3267a','#2d6bc4','#566860'];
+function avatar(i,c,size){
+  const a=AVATARS[i]||AVATARS[0],col=AVCOL.includes(c)?c:AVCOL[0];
+  return `<span class="av" style="--c:${col};width:${size}px;height:${size}px"><svg viewBox="0 0 24 24" aria-hidden="true">${a[1]}</svg></span>`;
+}
+function scoreOf(s){
+  const stars=Object.values(s.scen||{}).reduce((a,v)=>a+(v.stars||v||0),0);
+  return s.seen.length*5+Math.min(s.built,ASSEMBLY.length)*3+(s.built>=ASSEMBLY.length?30:0)+stars*20+Math.round((s.quiz.best||0)/2)+Math.min(s.find||0,50)*2;
+}
+
+
+/* ===== FIREBASE ACCOUNT LAYER ===== */
+const FIREBASE_CONFIG={apiKey:"AIzaSyDCJJxKYjXii84BUqdRhC9dHijinF6P7PA",authDomain:"pc-master-e0915.firebaseapp.com",projectId:"pc-master-e0915",storageBucket:"pc-master-e0915.firebasestorage.app",messagingSenderId:"951810914812",appId:"1:951810914812:web:01fa3e8e0e78fcd7c41a79"};
+const MAIL='@pc-trainer.app';
+const Acc={db:null,auth:null,uid:null,players:[],loaded:false,err:null,merged:false,last:'',busy:false,t:null,slow:false,isOwner:false,canWrite:null,unsub:null,cfg:false};
+
+function buildDoc(){
+  const scen={};Object.entries(ST.scen).forEach(([k,v])=>scen[k]=v.stars);
+  return{nick:ST.me.nick,group:ST.me.group,avatar:ST.me.avatar,color:ST.me.color,score:scoreOf(ST),seen:ST.seen.slice(),built:Math.min(ST.built,ASSEMBLY.length),scen,quiz:ST.quiz.best,find:Math.min(ST.find||0,50)};
+}
+const canSync=()=>!!(Acc.db&&Acc.uid&&ST.me);
+async function push(force){
+  if(!canSync())return;
+  if(Acc.busy){clearTimeout(Acc.t);Acc.t=setTimeout(()=>push(force),800);return}
+  const d=buildDoc(),sig=JSON.stringify(d);
+  if(!force&&sig===Acc.last)return;
+  Acc.busy=true;
+  try{await Acc.db.collection('players').doc(Acc.uid).set({...d,upd:firebase.firestore.FieldValue.serverTimestamp()});Acc.last=sig;Acc.err=null}
+  catch(e){Acc.err=e&&e.code||'unavailable'}
+  finally{Acc.busy=false}
+}
+syncHook=()=>{if(!canSync())return;clearTimeout(Acc.t);Acc.t=setTimeout(()=>push(false),1200)};
+
+function mergeRemote(r){
+  (r.seen||[]).forEach(id=>{if(PARTMAP[id]&&!ST.seen.includes(id))ST.seen.push(id)});
+  ST.built=Math.max(ST.built,r.built||0);
+  Object.entries(r.scen||{}).forEach(([k,n])=>{if(SCENARIOS.some(s=>s.id===k)){const c=ST.scen[k];if(!c||c.stars<n)ST.scen[k]={stars:n}}});
+  ST.quiz.best=Math.max(ST.quiz.best,r.quiz||0);
+  ST.find=Math.max(ST.find||0,r.find||0);
+  if(r.nick)ST.me={nick:r.nick,group:r.group||'',avatar:r.avatar||0,color:r.color||AVCOL[0]};
+  try{localStorage.setItem('pc-trainer-v1',JSON.stringify(ST))}catch(e){}
+  gotSet=new Set(ACH.filter(a=>a[3]()).map(a=>a[0]));
+}
+function onPlayers(){
+  const mine=Acc.players.find(p=>p.id===Acc.uid);
+  if(mine&&!Acc.merged){Acc.merged=true;mergeRemote(mine);Acc.last='';push(false)}
+  else if(!mine&&Acc.loaded&&!Acc.merged){Acc.merged=true;if(ST.me)push(true);else setTimeout(()=>openProfile(),300)}
+  renderAcc();
+  if(view==='rank')renderRank();
+  if(view==='prog')progInit();
+}
+function startSnap(){
+  if(Acc.unsub)return;
+  const slow=setTimeout(()=>{if(!Acc.loaded){Acc.slow=true;if(view==='rank')renderRank()}},10000);
+  Acc.unsub=Acc.db.collection('players').orderBy('score','desc').limit(300).onSnapshot(snap=>{
+    clearTimeout(slow);Acc.slow=false;Acc.err=null;Acc.loaded=true;
+    Acc.players=snap.docs.map(d=>({id:d.id,...d.data()}));onPlayers();
+  },e=>{clearTimeout(slow);Acc.err=e&&e.code||'unavailable';Acc.loaded=true;renderAcc();if(view==='rank')renderRank()});
+}
+function accInit(){
+  renderAcc();
+  Acc.cfg=!!(FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.projectId&&typeof firebase!=='undefined');
+  if(!Acc.cfg){renderAcc();return}
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    Acc.auth=firebase.auth();Acc.db=firebase.firestore();
+    Acc.auth.onAuthStateChanged(u=>{
+      Acc.uid=u?u.uid:null;
+      if(u)startSnap();
+      else{if(Acc.unsub){Acc.unsub();Acc.unsub=null}Acc.players=[];Acc.loaded=false;Acc.merged=false}
+      renderAcc();if(view==='rank')renderRank();
+    });
+  }catch(e){Acc.cfg=false}
+  renderAcc();
+}
+
+/* header button */
+function renderAcc(){
+  const b=$('#accBtn');
+  if(ST.me&&(Acc.uid||!Acc.cfg)){b.className='btn sm';b.innerHTML=avatar(ST.me.avatar,ST.me.color,28)+`<span class="nm">${esc(ST.me.nick)}</span>`;b.setAttribute('aria-label','Профиль: '+ST.me.nick)}
+  else{b.className='btn sm pri new';b.textContent='Вход';b.setAttribute('aria-label','Регистрация и вход')}
+}
+$('#accBtn').addEventListener('click',()=>openProfile());
+
+/* modal: sign-up / sign-in / profile */
+let lastFocus=null,authMode='reg';
+function closeModal(){$('#modal').hidden=true;document.removeEventListener('keydown',escClose);if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+function escClose(e){if(e.key==='Escape')closeModal()}
+const authErr=e=>{const c=e&&e.code||'';
+  if(c==='auth/email-already-in-use')return'Этот ник уже занят. Выбери другой';
+  if(c==='auth/weak-password')return'Пароль слишком короткий: минимум 6 символов';
+  if(c==='auth/invalid-credential'||c==='auth/wrong-password'||c==='auth/user-not-found'||c==='auth/invalid-login-credentials')return'Неверный ник или пароль';
+  if(c==='auth/too-many-requests')return'Слишком много попыток. Подожди немного';
+  if(c==='auth/network-request-failed')return'Нет связи с сервером';
+  if(c==='auth/operation-not-allowed')return'В Firebase не включён вход по паролю';
+  return'Ошибка: '+(c||'неизвестная')};
+function openProfile(){
+  lastFocus=document.activeElement;
+  const signed=!!Acc.uid;
+  if(!signed&&Acc.cfg){return openAuth()}
+  const me=ST.me||{nick:signed&&Acc.auth.currentUser&&Acc.auth.currentUser.email?Acc.auth.currentUser.email.split('@')[0]:'',group:'',avatar:Math.floor(Math.random()*AVATARS.length),color:AVCOL[Math.floor(Math.random()*AVCOL.length)]};
+  const f={group:me.group,avatar:me.avatar,color:me.color};
+  const groups=[...new Set(Acc.players.map(p=>p.group).filter(Boolean))].sort();
+  const sh=$('#sheet');
+  sh.innerHTML=`<div class="row sp"><h2 id="mTitle">${ST.me?'Профиль':'Заверши регистрацию'}</h2><button class="btn icon" id="mClose" aria-label="Закрыть"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div class="row" style="gap:12px"><span id="mPrev"></span><div style="flex:1;min-width:160px"><b>${esc(me.nick||'Гость')}</b><p class="muted" style="font-size:13px">${Acc.cfg?'Прогресс сохраняется в твоём аккаунте.':'Сайт не подключён к базе: профиль хранится только в этом браузере.'}</p></div></div>
+  ${Acc.cfg?'':`<div class="fld"><label for="fNick">Никнейм</label><input type="text" id="fNick" maxlength="16" autocomplete="off" value="${esc(me.nick)}"></div>`}
+  <div class="fld"><label for="fGroup">Группа</label><input type="text" id="fGroup" maxlength="12" autocomplete="off" list="glist" placeholder="Например, ВТ-79" value="${esc(f.group)}"><datalist id="glist">${groups.map(g=>`<option value="${esc(g)}">`).join('')}</datalist></div>
+  <div class="fld"><span class="lab">Аватар</span><div class="avgrid" id="fAv"></div></div>
+  <div class="fld"><span class="lab">Цвет</span><div class="cols" id="fCol"></div></div>
+  <div class="err" id="fErr" role="alert"></div>
+  <div class="row"><button class="btn pri" id="mSave">Сохранить</button><button class="btn" id="mCancel">Отмена</button>${signed?'<button class="btn sm" id="mOut" style="margin-left:auto">Выйти</button>':''}</div>
+  ${signed?'<div class="row"><button class="btn sm" id="mDel">Удалить профиль</button></div>':''}`;
+  wireAvatar(f);openModal();
+  const err=t=>{$('#fErr').textContent=t};
+  $('#mSave').onclick=async()=>{
+    const group=$('#fGroup').value.trim().replace(/\s+/g,' ').toUpperCase();
+    if(group.length<2||!/^[\p{L}\d\- ]+$/u.test(group))return err('Укажи группу: буквы, цифры и дефис, например ВТ-79');
+    let nick=me.nick;
+    if(!Acc.cfg){nick=$('#fNick').value.trim();if(!/^[\p{L}\d_.\-]{3,16}$/u.test(nick))return err('Ник: 3–16 символов')}
+    ST.me={nick,group,avatar:f.avatar,color:f.color};save();
+    $('#mSave').disabled=true;
+    if(canSync()){await push(true);if(Acc.err){err('Не удалось сохранить в рейтинг. Повтори позже');$('#mSave').disabled=false;return}}
+    renderAcc();closeModal();toast('Профиль сохранён');if(view==='rank')renderRank();
+  };
+  const out=$('#mOut');if(out)out.onclick=async()=>{await Acc.auth.signOut();wipeLocal();closeModal();toast('Ты вышел из аккаунта')};
+  const del=$('#mDel');
+  if(del){let armed=false;del.onclick=async()=>{
+    if(!armed){armed=true;del.textContent='Нажми ещё раз: аккаунт удалится';return}
+    try{await Acc.db.collection('players').doc(Acc.uid).delete();await Acc.auth.currentUser.delete();wipeLocal();closeModal();toast('Аккаунт удалён')}
+    catch(e){err(e&&e.code==='auth/requires-recent-login'?'Для удаления выйди, войди заново и повтори':'Не удалось удалить')}}}
+}
+function wipeLocal(){ST=JSON.parse(JSON.stringify(DEF));try{localStorage.setItem('pc-trainer-v1',JSON.stringify(ST))}catch(e){}gotSet=new Set();Acc.last='';Acc.merged=false;renderAcc();if(view==='rank')renderRank();if(view==='prog')progInit()}
+function openModal(){const modal=$('#modal');modal.hidden=false;document.addEventListener('keydown',escClose);modal.onclick=e=>{if(e.target===modal)closeModal()};$('#mClose').onclick=closeModal;$('#mCancel').onclick=closeModal}
+function wireAvatar(f){
+  const drawAv=()=>{$('#fAv').innerHTML=AVATARS.map((a,i)=>`<button type="button" data-i="${i}" aria-label="${a[0]}" title="${a[0]}" aria-pressed="${i===f.avatar}"><svg viewBox="0 0 24 24">${a[1]}</svg></button>`).join('');
+    $('#fCol').innerHTML=AVCOL.map(c=>`<button type="button" data-c="${c}" style="--c:${c}" aria-label="Цвет ${c}" aria-pressed="${c===f.color}"></button>`).join('');
+    $('#mPrev').innerHTML=avatar(f.avatar,f.color,56);
+    $('#fAv').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{f.avatar=+b.dataset.i;drawAv()}));
+    $('#fCol').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{f.color=b.dataset.c;drawAv()}))};
+  drawAv();
+}
+function openAuth(){
+  const f={avatar:Math.floor(Math.random()*AVATARS.length),color:AVCOL[Math.floor(Math.random()*AVCOL.length)]};
+  const groups=[...new Set(Acc.players.map(p=>p.group).filter(Boolean))].sort();
+  const reg=authMode==='reg';
+  $('#sheet').innerHTML=`<div class="row sp"><h2 id="mTitle">${reg?'Регистрация':'Вход'}</h2><button class="btn icon" id="mClose" aria-label="Закрыть"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div class="seg" role="group" aria-label="Режим"><button data-a="reg" aria-pressed="${reg}">Регистрация</button><button data-a="in" aria-pressed="${!reg}">Вход</button></div>
+  <div class="fld"><label for="fNick">Никнейм</label><input type="text" id="fNick" maxlength="16" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="латиница, цифры, _ - ."></div>
+  <div class="fld"><label for="fPass">Пароль</label><input type="password" id="fPass" autocomplete="${reg?"new-password":"current-password"}" placeholder="минимум 6 символов"></div>
+  ${reg?`<div class="fld"><label for="fGroup">Группа</label><input type="text" id="fGroup" maxlength="12" autocomplete="off" list="glist" placeholder="Например, ВТ-79"><datalist id="glist">${groups.map(g=>`<option value="${esc(g)}">`).join('')}</datalist></div>
+  <div class="row" style="gap:12px"><span id="mPrev"></span><span class="muted" style="font-size:13px">Выбери аватар и цвет</span></div>
+  <div class="fld"><div class="avgrid" id="fAv"></div></div><div class="fld"><div class="cols" id="fCol"></div></div>`:''}
+  <div class="err" id="fErr" role="alert"></div>
+  <div class="row"><button class="btn pri" id="mGo">${reg?'Создать аккаунт':'Войти'}</button><button class="btn" id="mCancel">Отмена</button></div>
+  <p class="muted" style="font-size:12px">${reg?'Пароль восстановить нельзя, запомни его. Прогресс с этого устройства перенесётся в аккаунт.':'После входа прогресс загрузится из аккаунта.'}</p>`;
+  if(reg)wireAvatar(f);
+  openModal();
+  $('#sheet').querySelectorAll('[data-a]').forEach(b=>b.addEventListener('click',()=>{authMode=b.dataset.a;openAuth()}));
+  const err=t=>{$('#fErr').textContent=t};
+  const go=async()=>{
+    const nick=$('#fNick').value.trim(),pw=$('#fPass').value;
+    if(!/^[A-Za-z0-9_.\-]{3,16}$/.test(nick))return err('Ник: 3–16 символов, только латиница, цифры и _ - .');
+    if(pw.length<6)return err('Пароль: минимум 6 символов');
+    const mail=nick.toLowerCase()+MAIL;
+    $('#mGo').disabled=true;err('');
+    try{
+      if(reg){
+        const group=$('#fGroup').value.trim().replace(/\s+/g,' ').toUpperCase();
+        if(group.length<2||!/^[\p{L}\d\- ]+$/u.test(group)){$('#mGo').disabled=false;return err('Укажи группу: буквы, цифры и дефис, например ВТ-79')}
+        ST.me={nick,group,avatar:f.avatar,color:f.color};
+        const cred=await Acc.auth.createUserWithEmailAndPassword(mail,pw);
+        Acc.uid=cred.user.uid;Acc.last='';save();await push(true);
+        toast('Аккаунт создан');
+      }else{
+        ST=JSON.parse(JSON.stringify(DEF));try{localStorage.setItem('pc-trainer-v1',JSON.stringify(ST))}catch(e){}
+        Acc.merged=false;await Acc.auth.signInWithEmailAndPassword(mail,pw);toast('Ты вошёл в аккаунт');
+      }
+      renderAcc();closeModal();
+    }catch(e){ if(reg)ST.me=null; $('#mGo').disabled=false;err(authErr(e))}
+  };
+  $('#mGo').onclick=go;
+  $('#sheet').querySelectorAll('input').forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')go()}));
+  setTimeout(()=>$('#fNick').focus(),30);
+}
+/* leaderboard */
+let rankMode='players',rankGroup='';
+function rankInit(){renderRank()}
+const ms=p=>p.upd&&p.upd.toMillis?p.upd.toMillis():0;
+function sortP(a,b){return b.score-a.score||ms(a)-ms(b)}
+function renderRank(){
+  const el=$('#v-rank');if(!el)return;
+  const online=!!(Acc.db&&Acc.uid);
+  let h=`<div class="head"><span class="eyebrow">Рейтинг</span><h1>Таблица лидеров</h1><p class="lead">Очки: 5 за каждую изученную деталь, 3 за шаг сборки и 30 за полную сборку, 20 за звезду сценария, до 50 за тест и 2 за найденную деталь.</p></div>`;
+  const all=Acc.players.slice().sort(sortP);
+  const mine=ST.me&&all.findIndex(p=>p.id===Acc.uid);
+  if(ST.me){
+    const sc=scoreOf(ST);
+    h+=`<div class="card row sp" style="gap:12px"><div class="row" style="gap:12px">${avatar(ST.me.avatar,ST.me.color,48)}<div><b>${esc(ST.me.nick)}</b><div class="muted" style="font-size:13px">${esc(ST.me.group)}${online&&mine>=0?` · место ${mine+1} из ${all.length}`:''}</div></div></div><div class="row" style="gap:12px"><span class="pts mono" style="font:600 20px var(--font-d)">${sc}</span><button class="btn sm" id="rEdit">Профиль</button></div></div>`;
+  }else{
+    h+=`<div class="card"><h2>Войди, чтобы попасть в рейтинг</h2><p class="muted" style="margin:6px 0 12px">Выбери ник, пароль, группу и аватар. Это займёт полминуты, а прогресс сохранится на любом устройстве.</p><button class="btn pri" id="rEdit">Регистрация и вход</button></div>`;
+  }
+  if(!Acc.cfg)h+=`<div class="note warn" style="margin-top:12px"><b>Сайт ещё не подключён к базе данных.</b> Прогресс хранится только в этом браузере. Владельцу нужно вставить настройки Firebase в файл сайта.</div>`;
+  else if(!Acc.uid)h+=`<div class="note warn" style="margin-top:12px"><b>Войди или зарегистрируйся.</b> Таблица лидеров видна только авторизованным студентам.</div>`;
+  else if(Acc.err)h+=`<div class="note warn" style="margin-top:12px">Рейтинг загрузить не удалось (${esc(Acc.err)}). Обнови страницу позже.</div>`;
+  else if(!Acc.loaded)h+=`<div class="note" style="margin-top:12px">${Acc.slow?'Рейтинг пока не отвечает. Данные могут быть устаревшими.':'Загружаю рейтинг…'}</div>`;
+  if(online&&Acc.loaded){
+    const groups=[...new Set(all.map(p=>p.group).filter(Boolean))].sort();
+    h+=`<div class="row" style="margin-top:14px"><div class="seg" role="group" aria-label="Режим"><button data-m="players" aria-pressed="${rankMode==='players'}">Игроки</button><button data-m="groups" aria-pressed="${rankMode==='groups'}">Группы</button></div>`;
+    if(rankMode==='players')h+=`<select class="sel" id="rGroup" aria-label="Фильтр по группе"><option value="">Все группы</option>${groups.map(g=>`<option${g===rankGroup?' selected':''}>${esc(g)}</option>`).join('')}</select>`;
+    h+=`</div><div class="lb">`;
+    if(rankMode==='players'){
+      const list=all.filter(p=>!rankGroup||p.group===rankGroup);
+      if(!list.length)h+=`<div class="card"><p class="muted">Здесь пока никого нет. Стань первым.</p></div>`;
+      list.forEach((p,i)=>{
+        const stars=Object.values(p.scen||{}).reduce((a,n)=>a+n,0),me=p.id===Acc.uid;
+        h+=`<div class="lr r${i+1<=3?i+1:0}${me?' me':''}"><div class="rk">${i+1}</div>${avatar(p.avatar,p.color,38)}<div style="min-width:0"><div class="nm">${esc(p.nick)}${me?' (ты)':''}</div><div class="sub">${esc(p.group||'')} · ★ ${stars} · детали ${(p.seen||[]).length}/${PARTS.length} · сборка ${p.built||0}/${ASSEMBLY.length} · тест ${p.quiz||0}%</div></div><div class="pts">${p.score}<small>очков</small></div>${false&&!me?`<div class="x"><button class="btn sm" data-del="${p.id}">Удалить игрока</button></div>`:''}</div>`});
+    }else{
+      const g={};all.forEach(p=>{const k=p.group||'Без группы';(g[k]=g[k]||{n:0,s:0})&&(g[k].n++,g[k].s+=p.score)});
+      const list=Object.entries(g).map(([k,v])=>({k,n:v.n,s:v.s,avg:Math.round(v.s/v.n)})).sort((a,b)=>b.avg-a.avg||b.n-a.n);
+      if(!list.length)h+=`<div class="card"><p class="muted">Групп пока нет.</p></div>`;
+      list.forEach((x,i)=>{const me=ST.me&&x.k===ST.me.group;
+        h+=`<div class="lr r${i+1<=3?i+1:0}${me?' me':''}" style="grid-template-columns:34px minmax(0,1fr) auto"><div class="rk">${i+1}</div><div style="min-width:0"><div class="nm">${esc(x.k)}${me?' (твоя)':''}</div><div class="sub">участников: ${x.n} · всего очков: ${x.s}</div></div><div class="pts">${x.avg}<small>в среднем</small></div></div>`});
+    }
+    h+=`</div>`;
+  }
+  el.innerHTML=h;
+  const re=$('#rEdit');if(re)re.addEventListener('click',()=>openProfile());
+  el.querySelectorAll('[data-m]').forEach(b=>b.addEventListener('click',()=>{rankMode=b.dataset.m;renderRank()}));
+  const rg=$('#rGroup');if(rg)rg.addEventListener('change',()=>{rankGroup=rg.value;renderRank()});
+  el.querySelectorAll('[data-del]').forEach(b=>{let armed=false;b.addEventListener('click',async()=>{
+    if(!armed){armed=true;b.textContent='Нажми ещё раз';return}
+    try{await Acc.db.doc('players/'+b.dataset.del).delete();toast('Игрок удалён')}catch(e){toast('Не удалось удалить')}})});
+}
+
+/* ---------- boot ---------- */
+function measure(){const h=document.querySelector('.top').offsetHeight;document.documentElement.style.setProperty('--hh',h+'px')}
+new ResizeObserver(measure).observe(document.querySelector('.top'));measure();
+const ok=Scene3D.init($('#gl'));
+applyTheme(isDark);
+if(!ok){const m=$('#stageMsg');m.hidden=false;m.innerHTML='<div><b>3D-модель не запустилась</b><p>Браузер не поддерживает WebGL или не загрузилась библиотека. Тексты, сценарии и тест работают без неё.</p></div>';$('#tools').hidden=true;$('#hint').hidden=true}
+accInit();
+go(VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):'lab',true);
+
+
+</script>
+</body>
+</html>
